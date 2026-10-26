@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+
+# Secrets — never commit
+.env
+.env.*
+!.env.example
+
+# macOS junk
+.DS_Store
+**/.DS_Store
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Runtime sessions (contains WhatsApp auth — DO NOT leak)
+whatsapp-sessions/
+uploads/
+
+# Local databases / sqlite
+*.db
+*.sqlite
+
+# Coverage / build
+coverage/
+dist/
+build/
