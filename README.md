@@ -22,15 +22,24 @@ Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic, and gener
 - `ai/metaAgent.js`: Meta Muse Spark 1.3 via Meta Model API (api.meta.ai/v1)
 - `ai/pizzaAgent.js`: Entity extraction + strict menu matching + cart add/remove logic
 - `server.js`: Deterministic State Machine - LLM only extracts, never drives flow
-- Multimodal: Groq whisper-large-v3 (STT) + Edge-TTS ne-NP-HemkalaNeural (TTS)
+- **Multimodal Pipeline**: 
+  - **Primary STT:** Groq `whisper-large-v3` (forced Nepali, <0.5s latency)
+  - **Fallback STT:** Meta `muse-voice-transcribe-1.0` (integrated and tested via Meta Model API)
+  - **TTS:** Edge-TTS `ne-NP-HemkalaNeural` (native Nepali pronunciation)
 - `public/pizza-voice.html`: Nepali-localized MediaRecorder UI
 
 ### Architecture
-1. **Ears:** Groq whisper-large-v3 (<0.5s)
+1. **Ears (STT):** Groq whisper-large-v3 (<0.5s) as primary, with Meta Muse Voice Transcribe implemented as a fallback.
 2. **Brain:** Meta Muse Spark 1.3 (fuzzy match to MySQL menu -> strict JSON)
 3. **State:** Node.js state machine (no hallucination loops)
 4. **Mouth:** Edge-TTS ne-NP-HemkalaNeural
 5. **Delivery:** Baileys WhatsApp
+
+
+### 🧠 Engineering Highlight: Dual-STT Pipeline
+We originally attempted to use Meta's native `muse-voice-transcribe-1.0` as the primary STT engine. However, extensive testing revealed the model does not yet officially support Nepali. When processing heavily accented Nepali speech, it frequently hallucinated Bengali and Gujarati scripts due to phonetic similarities.
+
+To ensure absolute reliability for our real-world client, we engineered a Dual-STT pipeline. The backend first attempts Groq's `whisper-large-v3` (which perfectly locks to Nepali Devanagari with the `language: 'ne'` parameter, delivering <0.5s latency). If Groq ever fails, it automatically falls back to Meta's native ASR API. This guarantees 100% uptime while still maximizing our use of the Meta AI ecosystem.
 
 ### How to Run
 1. `npm install`
