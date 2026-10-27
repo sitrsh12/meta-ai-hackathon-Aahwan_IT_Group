@@ -10,9 +10,37 @@ body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(
 h1 { margin-bottom: 8px; font-weight: 800; font-size: 26px; }
 p.subtitle { color: #fed7aa; margin-top: 0; margin-bottom: 30px; font-size: 16px; }
 .box { background: white; color: #1e293b; padding: 35px 25px; border-radius: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); box-sizing: border-box; }
-.mic-container { width: 90px; height: 90px; background: #f1f5f9; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
-.mic-container.listening { background: #fef2f2; box-shadow: 0 0 0 15px rgba(239,68,68,0.2); }
-.mic-container.speaking { background: #fff7ed; box-shadow: 0 0 0 15px rgba(234,88,12,0.2); }
+.mic-container { 
+  width: 90px; height: 90px; background: #f8fafc; border-radius: 50%; margin: 0 auto 24px; 
+  display: flex; align-items: center; justify-content: center; font-size: 36px; 
+  position: relative; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+}
+.mic-container.listening { 
+  background: #fef2f2; box-shadow: 0 0 0 15px rgba(239,68,68,0.15); 
+  animation: pulse-ring 1.5s infinite; 
+}
+.mic-container.processing { 
+  background: #f8fafc; border: 4px solid #e2e8f0; border-top-color: #b91c1c; 
+  animation: spin 1s linear infinite; 
+}
+.mic-container.speaking { 
+  background: #fff7ed; box-shadow: 0 0 0 15px rgba(234,88,12,0.15); 
+  animation: pulse-speak 2s infinite; 
+}
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(185,28,28,0.4); }
+  70% { box-shadow: 0 0 0 20px rgba(185,28,28,0); }
+  100% { box-shadow: 0 0 0 0 rgba(185,28,28,0); }
+}
+@keyframes pulse-speak {
+  0% { box-shadow: 0 0 0 0 rgba(234,88,12,0.4); }
+  70% { box-shadow: 0 0 0 15px rgba(234,88,12,0); }
+  100% { box-shadow: 0 0 0 0 rgba(234,88,12,0); }
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 #status { font-weight: 600; font-size: 16px; margin-bottom: 12px; min-height: 20px; color: #b91c1c; }
 #aiReply { color: #64748b; font-style: italic; min-height: 40px; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
 button { background: #b91c1c; color: white; padding: 16px 32px; border: none; border-radius: 50px; font-size: 17px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 15px; }
@@ -20,10 +48,17 @@ button:disabled { background: #94a3b8; cursor: not-allowed; }
 .confirm-btn { background: #16a34a; display: none; }
 .reset-btn { background: #2563eb; display: none; }
 input.namebox { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; margin-top: 12px; box-sizing: border-box; }
+
+  .brand-logo {
+    width: 140px;
+    height: auto;
+    margin-bottom: 10px;
+    filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.4));
+  }
 </style>
 </head>
 <body>
-<h1>पिज्जा घर</h1>
+<img src="pizzaghar-real.png" alt="Pizza Ghar" class="brand-logo" style="background: white; padding: 10px; border-radius: 16px; width: 180px;">
 <p class="subtitle">नेपाली भ्वाइस एआई अर्डर - Muse Spark 1.3</p>
 <div class="box" id="phoneScreen">
 <h2 style="margin-top:0;">नमस्ते!</h2>
@@ -216,8 +251,11 @@ function startCall() {
         const formData = new FormData();
         formData.append('audio', audioBlob, 'voice.webm');
 
-        statusEl.innerText = 'Sochdei chhu...';
-        fetch('/hackathon/api/transcribe', {
+        statusEl.innerText = 'प्रोसेस हुँदैछ...';
+        micVisual.className = 'mic-container processing';
+        micVisual.innerText = '🧠';
+        
+        fetch('/hackathon/api/transcribe?v=4', {
           method: 'POST',
           body: formData
         })

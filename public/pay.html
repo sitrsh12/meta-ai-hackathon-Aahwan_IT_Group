@@ -3,40 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Secure Checkout - ZapperTrip</title>
+<title>Secure Checkout - Pizza Ghar</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <style>
     .pay-option { transition: all 0.2s; cursor: pointer; }
-    .pay-option.selected { border-color: #0f766e; background-color: #f0fdfa; box-shadow: 0 0 0 1px #0f766e; }
+    .pay-option.selected { border-color: #b91c1c; background-color: #fef2f2; box-shadow: 0 0 0 1px #b91c1c; }
 </style>
 </head>
 <body class="bg-slate-50 font-sans flex items-center justify-center min-h-screen p-4">
 
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 sm:p-8 text-center">
-        <div class="w-16 h-16 bg-teal-100 text-teal-600 rounded-full flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">🏨</div>
-        <h1 class="text-2xl font-bold text-slate-800 mb-1">ZapperTrip Resort</h1>
-        <p class="text-slate-500 text-sm mb-6">Secure Payment Gateway</p>
+        <img src="pizzaghar-real.png" alt="Pizza Ghar" class="w-48 h-auto mx-auto mb-4 drop-shadow-md bg-white p-2 rounded-xl">
+                <p class="text-slate-500 text-sm mb-6">Secure Payment Gateway</p>
 
         <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-200 text-left text-sm">
-            <div class="flex justify-between mb-2">
-                <span class="text-slate-500">Room:</span>
-                <span id="roomName" class="font-bold text-slate-800">Loading...</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="text-slate-500">Check-In:</span>
-                <span id="checkIn" class="font-bold text-slate-800">-</span>
-            </div>
-            <div class="flex justify-between mb-2">
-                <span class="text-slate-500">Check-Out:</span>
-                <span id="checkOut" class="font-bold text-slate-800">-</span>
-            </div>
-            <div class="flex justify-between mb-2 border-b border-slate-200 pb-2">
-                <span class="text-slate-500">Duration:</span>
-                <span id="nights" class="font-bold text-slate-800">-</span>
-            </div>
             <div class="flex justify-between pt-1">
                 <span class="text-slate-600 font-bold">Total Amount:</span>
-                <span id="roomPrice" class="font-bold text-teal-600 text-lg">Rs 0</span>
+                <span id="orderPrice" class="font-bold text-red-600 text-lg">Rs 0</span>
             </div>
         </div>
 
@@ -47,16 +30,16 @@
                     <div class="pay-option selected border-2 border-slate-200 rounded-xl p-3 flex items-center gap-3" onclick="selectOption(this, 'eSewa')">
                         <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center font-bold text-green-600 text-xs">eSewa</div>
                         <div class="flex-1"><p class="font-bold text-slate-700 text-sm">eSewa</p></div>
-                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center"><div class="w-2.5 h-2.5 rounded-full bg-teal-600 hidden check-dot"></div></div>
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center"><div class="w-2.5 h-2.5 rounded-full bg-red-600 hidden check-dot"></div></div>
                     </div>
                     <div class="pay-option border-2 border-slate-200 rounded-xl p-3 flex items-center gap-3" onclick="selectOption(this, 'Khalti')">
                         <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center font-bold text-purple-600 text-xs">Khalti</div>
                         <div class="flex-1"><p class="font-bold text-slate-700 text-sm">Khalti</p></div>
-                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center"><div class="w-2.5 h-2.5 rounded-full bg-teal-600 hidden check-dot"></div></div>
+                        <div class="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center"><div class="w-2.5 h-2.5 rounded-full bg-red-600 hidden check-dot"></div></div>
                     </div>
                 </div>
             </div>
-            <button onclick="processPayment()" id="payBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-4 rounded-xl transition duration-200 shadow-lg flex items-center justify-center gap-2">
+            <button onclick="processPayment()" id="payBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-4 rounded-xl transition duration-200 shadow-lg flex items-center justify-center gap-2">
                 <span id="btnText">Pay with eSewa</span>
             </button>
         </div>
@@ -69,36 +52,28 @@
 
     <script>
         const params = new URLSearchParams(window.location.search);
-        const room = params.get('room') || 'Room';
         const price = params.get('price') || '0';
         const phone = params.get('phone') || '';
-        const checkIn = params.get('check_in') || '-';
-        const checkOut = params.get('check_out') || '-';
-        const nights = params.get('nights') || '1';
 
-        document.getElementById('roomName').innerText = room;
-        document.getElementById('roomPrice').innerText = 'Rs ' + price;
-        document.getElementById('checkIn').innerText = checkIn;
-        document.getElementById('checkOut').innerText = checkOut;
-        document.getElementById('nights').innerText = nights + ' nights';
+        document.getElementById('orderPrice').innerText = 'Rs ' + price;
 
         let selectedMethod = 'eSewa';
 
         function selectOption(element, method) {
             document.querySelectorAll('.pay-option').forEach(el => {
-                el.classList.remove('selected', 'border-teal-600');
+                el.classList.remove('selected', 'border-red-600');
                 el.classList.add('border-slate-200');
                 el.querySelector('.check-dot').classList.add('hidden');
             });
             element.classList.remove('border-slate-200');
-            element.classList.add('selected', 'border-teal-600');
+            element.classList.add('selected', 'border-red-600');
             element.querySelector('.check-dot').classList.remove('hidden');
             selectedMethod = method;
             document.getElementById('btnText').innerText = 'Pay with ' + method;
         }
 
         document.querySelectorAll('.pay-option')[0].querySelector('.check-dot').classList.remove('hidden');
-        document.querySelectorAll('.pay-option')[0].classList.add('border-teal-600');
+        document.querySelectorAll('.pay-option')[0].classList.add('border-red-600');
         document.querySelectorAll('.pay-option')[0].classList.remove('border-slate-200');
 
         async function processPayment() {
@@ -106,15 +81,8 @@
             btn.innerHTML = '<span class="animate-spin text-xl">⏳</span> Processing...';
             btn.disabled = true;
 
-            try {
-                await fetch('/hackathon/api/pay-confirm', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ phone: phone, room: room, method: selectedMethod })
-                });
-            } catch (err) { console.error('Failed to trigger final WA message', err); }
-
-            localStorage.removeItem('zappertrip_pending_booking');
+            // Simulate payment processing (frontend mock for demo)
+            await new Promise(resolve => setTimeout(resolve, 1000));
 
             setTimeout(() => {
                 document.getElementById('paymentForm').style.display = 'none';
