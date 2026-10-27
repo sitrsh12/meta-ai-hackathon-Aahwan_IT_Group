@@ -1,33 +1,41 @@
-# Meta AI Hackathon - Aahwan IT Group
+# 🍕 Pizza Ghar — Voice Ordering Agent
+**Meta Global AI Developer Hackathon · Startup Track · Build for Your World**
 
-## Project Overview
-**Zappertrip Voice AI Agent** is a multimodal AI agent built during the Meta Global AI Developer Hackathon. 
+> Production voice agent for a real restaurant in Nepal. Voice in (EN/NE/Hinglish) -> Muse Spark 1.3 extracts JSON -> deterministic state machine -> WhatsApp receipt + payment link.
 
-Built by **Aahwan IT Group Pvt Ltd**, this project is a B2B SaaS solution for local businesses in Nepal. Our first pilot client is **Pizza Ghar** (a local food chain), but the platform is designed to be deployed to any shop or distributor.
+**Demo:** [90s Loom - TODO] | **Live:** [https://whatsapp.zappertrip.com/hackathon/pizza-voice](https://whatsapp.zappertrip.com/hackathon/pizza-voice)
 
-It allows customers to place food orders using natural voice commands, which are processed by **Meta Muse Spark** and seamlessly pushed to the shop owner via a WhatsApp gateway.
+### Problem
+Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic, and generic bots fail on Nepali accent + Hinglish. Pizza Ghar understands messy spoken language, matches to a real MySQL menu, and frees the owner.
 
-## Problem Statement
-**Build for Your World:** Millions of small businesses in Nepal run entirely on WhatsApp. However, taking orders manually is chaotic and time-consuming. This project bridges the gap by providing an AI Voice Agent that handles the order intake, calculates totals, and triggers WhatsApp receipts.
+### What’s New (Oct 26 - Nov 4) - Hackathon Compliance
+**Pre-hackathon (Before Oct 26):**
+- Zappertrip gateway (Node.js + Baileys) - used ONLY as message sender
 
-## New Work Built During the Hackathon
-To comply with the hackathon rules, here is the clear separation of work:
-*   **Legacy Code (Pre-Hackathon):** The Zappertrip WhatsApp gateway (Node.js + Baileys) used to send messages.
-*   **New Work (Built Oct 26 - Nov 4):**
-    *   Integration of **Meta Muse Spark 1.1** via the Meta Model API.
-    *   A deterministic Node.js State Machine to manage the voice conversation flow (preventing AI loops).
-    *   A sleek web interface for the Voice AI agent.
-    *   A mock e-commerce checkout page triggered by WhatsApp.
-    *   Text-to-SQL capabilities using Meta Muse Spark for the distributor dashboard.
+**Built DURING hackathon:**
+- `ai/metaAgent.js`: Meta Muse Spark 1.3 via Meta Model API (api.meta.ai/v1)
+- `ai/pizzaAgent.js`: Entity extraction + strict menu matching + cart add/remove logic
+- `server.js`: Deterministic State Machine - LLM only extracts, never drives flow
+- Multimodal: Groq whisper-large-v3 (STT) + Edge-TTS ne-NP-HemkalaNeural (TTS)
+- `public/pizza-voice.html`: Nepali-localized MediaRecorder UI
 
-## Architecture
-1. **Frontend:** HTML/Vanilla JS (Web Speech API for voice capture).
-2. **Backend:** Node.js (Express) + PM2.
-3. **AI Engine:** Meta Muse Spark 1.1 (Primary), Groq/Gemini (Fallback).
-4. **Database:** MySQL (reads product prices, writes bookings).
-5. **Messaging:** Local Baileys WhatsApp API Gateway (Zappertrip Gateway).
+### Architecture
+1. **Ears:** Groq whisper-large-v3 (<0.5s)
+2. **Brain:** Meta Muse Spark 1.3 (fuzzy match to MySQL menu -> strict JSON)
+3. **State:** Node.js state machine (no hallucination loops)
+4. **Mouth:** Edge-TTS ne-NP-HemkalaNeural
+5. **Delivery:** Baileys WhatsApp
 
-## How to Run
-1. npm install
-2. Set up .env (see .env.example)
-3. npm start
+### How to Run
+1. `npm install`
+2. `cp .env.example .env` (add `META_API_KEY`, `GROQ_API_KEY`)
+3. `npm start`
+4. Open `http://localhost:3050/pizza-voice.html`
+
+> Without `MAIN_APP_URL`, runs in console-only mode (perfect for judges without WhatsApp).
+
+### Demo Flow (90s)
+1. Enter phone, tap mic: "One Veggie Feast Pizza and a Mango Lassi"
+2. See Spark 1.3 JSON + Nepali confirmation
+3. Say "Remove the pizza" -> subtraction works
+4. Confirm -> WhatsApp receipt

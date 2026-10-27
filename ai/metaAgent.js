@@ -24,7 +24,7 @@ async function callMetaLlama(prompt, systemPrompt = "You are a helpful assistant
         method: "POST",
         headers: { "Content-Type": "application/json", "Authorization": "Bearer " + process.env.META_API_KEY },
         body: JSON.stringify({
-          model: process.env.META_MODEL || "muse-spark-1.1", 
+          model: process.env.META_MODEL || "muse-spark-1.3", 
           messages: messages,
           temperature: 0.1
         }),

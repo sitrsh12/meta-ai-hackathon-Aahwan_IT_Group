@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>पिज्जा घर - नेपाली भ्वाइस अर्डर</title>
+<script src="phone-input.js"></script>
+<style>
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #b91c1c 0%, #431407 100%); color: white; text-align: center; padding: 20px; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+h1 { margin-bottom: 8px; font-weight: 800; font-size: 26px; }
+p.subtitle { color: #fed7aa; margin-top: 0; margin-bottom: 30px; font-size: 16px; }
+.box { background: white; color: #1e293b; padding: 35px 25px; border-radius: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); box-sizing: border-box; }
+.mic-container { width: 90px; height: 90px; background: #f1f5f9; border-radius: 50%; margin: 0 auto 24px; display: flex; align-items: center; justify-content: center; font-size: 36px; }
+.mic-container.listening { background: #fef2f2; box-shadow: 0 0 0 15px rgba(239,68,68,0.2); }
+.mic-container.speaking { background: #fff7ed; box-shadow: 0 0 0 15px rgba(234,88,12,0.2); }
+#status { font-weight: 600; font-size: 16px; margin-bottom: 12px; min-height: 20px; color: #b91c1c; }
+#aiReply { color: #64748b; font-style: italic; min-height: 40px; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
+button { background: #b91c1c; color: white; padding: 16px 32px; border: none; border-radius: 50px; font-size: 17px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 15px; }
+button:disabled { background: #94a3b8; cursor: not-allowed; }
+.confirm-btn { background: #16a34a; display: none; }
+.reset-btn { background: #2563eb; display: none; }
+input.namebox { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; margin-top: 12px; box-sizing: border-box; }
+</style>
+</head>
+<body>
+<h1>पिज्जा घर</h1>
+<p class="subtitle">नेपाली भ्वाइस एआई अर्डर - Muse Spark 1.3</p>
+<div class="box" id="phoneScreen">
+<h2 style="margin-top:0;">नमस्ते!</h2>
+<p style="color:#64748b;font-size:14px;">WhatsApp नम्बर हाल्नुहोस्, अर्डरको पेमेन्ट लिंक त्यहीँ आउँछ।</p>
+<div style="text-align:left;">
+<label style="font-size:12px;font-weight:700;color:#475569;">WhatsApp नम्बर</label>
+<div id="phoneInputHost"></div>
+<input id="judgeName" class="namebox" placeholder="तपाईंको नाम">
+</div>
+<button onclick="startDemo()">अर्डर गर्न यहाँ थिच्नुहोस्</button>
+</div>
+<div class="box" id="callScreen" style="display:none;">
+<div class="mic-container" id="micVisual">🎙️</div>
+<h2 id="status">बोल्न थिच्नुहोस्</h2>
+<p id="aiReply">पिज्जा घरमा स्वागत छ। के अर्डर गर्नुहुन्छ?</p>
+<button onclick="startCall()" id="callBtn">🎙️ बोल्नुहोस्</button>
+<button onclick="confirmOrder()" id="confirmBtn" class="confirm-btn">✅ अर्डर कन्फर्म गर्नुहोस्</button>
+<button onclick="resetOrder()" id="resetBtn" class="reset-btn">🔄 नयाँ अर्डर</button>
+<button onclick="window.open('https://whatsapp.zappertrip.com/store/5', '_blank')" style="background:#2563eb; margin-top:10px; font-size:15px; padding:14px; font-weight:bold; border-radius:50px; color:white; border:none; width:100%; cursor:pointer;">📖 मेनु हेर्नुहोस्</button>
+</div>
+<script>
+let judgePhone = '';
+let judgeName = 'Voice Customer';
+let chatHistory = [];
+let lastOrderText = '';
+let pendingTotal = 0;
+let statusEl = document.getElementById('status');
+let aiReplyEl = document.getElementById('aiReply');
+let micVisual = document.getElementById('micVisual');
+let callBtn = document.getElementById('callBtn');
+let confirmBtn = document.getElementById('confirmBtn');
+let resetBtn = document.getElementById('resetBtn');
+document.addEventListener('DOMContentLoaded', function() {
+  if (window.PhoneInput) { PhoneInput.mount('phoneInputHost', { id: 'judgePhone', placeholder: '98446XXXXX', defaultCountry: 'NP' }); }
+});
+let SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+function startDemo() {
+  let phone = window.PhoneInput ? PhoneInput.getDigits('judgePhone') : '';
+  if (!phone || phone.length < 10) { alert('Valid WhatsApp number halnus.'); return; }
+  judgePhone = phone;
+  let n = document.getElementById('judgeName').value.trim();
+  if (n) { judgeName = n; }
+  document.getElementById('phoneScreen').style.display = 'none';
+  document.getElementById('callScreen').style.display = 'block';
+}
+function resetOrder() {
+  chatHistory = [];
+  lastOrderText = '';
+  pendingTotal = 0;
+  confirmBtn.style.display = 'none';
+  resetBtn.style.display = 'none';
+  callBtn.style.display = 'block';
+  micVisual.style.display = 'flex';
+  aiReplyEl.innerText = 'पिज्जा घरमा स्वागत छ। के अर्डर गर्नुहुन्छ?';
+  statusEl.innerText = 'बोल्न थिच्नुहोस्';
+}
+function cleanText(text) { return text.replace(/[*_#`~]/g, '').replace(/\n/g, ' ').trim(); }
+var __nepVoices = [];
+var __nepPicked = null;
+function __pickNepaliVoice(vs) {
+  var i = 0;
+  var picked = null;
+  for (i=0;i<vs.length;i++) { if (vs[i].lang === 'ne-NP' || (vs[i].lang && vs[i].lang.indexOf('ne-') === 0)) { picked = vs[i]; break; } }
+  if (!picked) { for (i=0;i<vs.length;i++) { if (vs[i].lang === 'hi-IN') { picked = vs[i]; break; } } }
+  if (!picked) { for (i=0;i<vs.length;i++) { if (vs[i].lang && vs[i].lang.indexOf('hi') === 0) { picked = vs[i]; break; } } }
+  if (!picked) { for (i=0;i<vs.length;i++) { if (vs[i].lang === 'en-IN') { picked = vs[i]; break; } } }
+  return picked;
+}
+function __loadNepVoices() {
+  try {
+    var vs = window.speechSynthesis.getVoices() || [];
+    if (vs.length > 0) {
+      __nepVoices = vs;
+      window.__nepVoices = vs;
+      __nepPicked = __pickNepaliVoice(vs);
+      var lbl = document.getElementById('voiceLabel');
+      if (lbl) {
+        if (__nepPicked) { lbl.innerText = 'Voice: ' + __nepPicked.name + ' (' + __nepPicked.lang + ')'; }
+        else { lbl.innerText = 'Voice: default English - Nepali voice not found, Android ma test garnus'; }
+      }
+    }
+  } catch(e) {}
+}
+if (window.speechSynthesis) {
+  __loadNepVoices();
+  if (window.speechSynthesis.onvoiceschanged !== undefined) { window.speechSynthesis.onvoiceschanged = __loadNepVoices; }
+}
+function speak(text) {
+  window.speechSynthesis.cancel();
+  let clean = cleanText(text);
+  aiReplyEl.innerText = '"' + clean + '"';
+  micVisual.className = 'mic-container speaking';
+  micVisual.innerText = '🔊';
+  statusEl.innerText = 'AI बोल्दैछ...';
+  
+  fetch('/hackathon/api/pizza-tts', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ text: clean })
+  })
+  .then(res => {
+    if (!res.ok) throw new Error('TTS API failed');
+    return res.blob();
+  })
+  .then(blob => {
+    const audioUrl = URL.createObjectURL(blob);
+    const audio = new Audio(audioUrl);
+    audio.onended = function() {
+      micVisual.className = 'mic-container';
+      micVisual.innerText = '🎙️';
+      statusEl.innerText = 'फेरि बोल्नुहोस्';
+      callBtn.disabled = false;
+      callBtn.innerText = '🎙️ फेरि बोल्नुहोस्';
+    };
+    audio.play();
+  })
+  .catch(err => {
+    console.error('Audio playback failed', err);
+    // Fallback to native TTS just in case edge-tts fails
+    let utt = new SpeechSynthesisUtterance(clean);
+    utt.lang = 'hi-IN';
+    utt.onend = function() {
+      micVisual.className = 'mic-container';
+      micVisual.innerText = '🎙️';
+      statusEl.innerText = 'फेरि बोल्नुहोस्';
+      callBtn.disabled = false;
+      callBtn.innerText = '🎙️ फेरि बोल्नुहोस्';
+    };
+    window.speechSynthesis.speak(utt);
+  });
+}
+
+async function processBackend(userText, confirmed) {
+  statusEl.innerText = 'प्रोसेस हुँदैछ...';
+  aiReplyEl.innerText = 'Sochdei chhu...';
+  micVisual.className = 'mic-container';
+  if (!confirmed) { chatHistory.push({ role: 'user', content: userText }); }
+  try {
+    let sendText = confirmed ? lastOrderText : userText;
+    let res = await fetch('/hackathon/api/pizza-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: sendText, phone: judgePhone, name: judgeName, history: chatHistory, confirmed: confirmed === true })
+    });
+    let data = await res.json();
+    chatHistory.push({ role: 'assistant', content: data.reply });
+    if (!confirmed && data.step === 'CONFIRMING') {
+      lastOrderText = userText;
+      pendingTotal = data.total || 0;
+      confirmBtn.style.display = 'block';
+    } else if (data.booking_confirmed) {
+      confirmBtn.style.display = 'none';
+      callBtn.style.display = 'none';
+      micVisual.style.display = 'none';
+      resetBtn.style.display = 'block';
+    } else {
+      if (data.step === 'TAKING_ORDER' && !confirmed) { lastOrderText = ''; }
+      confirmBtn.style.display = 'none';
+    }
+    speak(data.reply);
+  } catch (err) { speak('Maaf garnus, server sanga connection chutyo.'); }
+}
+function confirmOrder() {
+  if (!lastOrderText) { alert('Pahila order bolnus.'); return; }
+  confirmBtn.disabled = true;
+  processBackend(lastOrderText, true).then(function() { confirmBtn.disabled = false; });
+}
+let mediaRecorder;
+let audioChunks = [];
+
+function startCall() {
+  window.speechSynthesis.cancel();
+  callBtn.disabled = true;
+  callBtn.innerText = 'सुन्दैछु...';
+  aiReplyEl.innerText = '';
+  micVisual.className = 'mic-container listening';
+  statusEl.innerText = 'सुन्दैछु... बोल्नुहोस् न';
+
+  navigator.mediaDevices.getUserMedia({ audio: true })
+    .then(stream => {
+      mediaRecorder = new MediaRecorder(stream);
+      audioChunks = [];
+
+      mediaRecorder.ondataavailable = event => {
+        audioChunks.push(event.data);
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        const formData = new FormData();
+        formData.append('audio', audioBlob, 'voice.webm');
+
+        statusEl.innerText = 'Sochdei chhu...';
+        fetch('/hackathon/api/transcribe', {
+          method: 'POST',
+          body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.text) {
+            processBackend(data.text, false);
+          } else {
+            throw new Error('No text returned');
+          }
+        })
+        .catch(err => {
+          console.error(err);
+          statusEl.innerText = 'सुनिएन। फेरि बोल्नुहोस्।';
+          callBtn.disabled = false;
+          callBtn.innerText = '🎙️ फेरि बोल्नुहोस्';
+          micVisual.className = 'mic-container';
+        });
+      };
+
+      mediaRecorder.start();
+      
+      // Auto-stop after 6 seconds
+      setTimeout(() => {
+        if (mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+          stream.getTracks().forEach(track => track.stop()); // Release mic
+        }
+      }, 6000);
+
+    })
+    .catch(err => {
+      console.error('Mic access denied', err);
+      alert('Microphone permission denied. Please allow mic access.');
+      statusEl.innerText = 'माइक त्रुटि';
+      callBtn.disabled = false;
+      callBtn.innerText = 'फेरि प्रयास गर्नुहोस्';
+      micVisual.className = 'mic-container';
+    });
+}
+</script>
+</body>
+</html>
