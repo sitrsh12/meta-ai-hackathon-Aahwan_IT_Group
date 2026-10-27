@@ -15,6 +15,12 @@
 - 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
 - 📈 **Traction Dashboard (103 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
 
+### 🏪 Real Client Consent - VERIFIED
+**Client:** PizzaGhar, Birtamode, Jhapa, Nepal  
+**Consent:** ✅ Obtained on 27 Oct 2026 via WhatsApp  
+**Permission:** Shop name, photo, demo video usage for Meta Hackathon  
+**Privacy:** Customer PII masked (98XXXXXXXX).
+
 ### Problem
 Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic. Generic bots fail on Nepali accent + Hinglish.
 
