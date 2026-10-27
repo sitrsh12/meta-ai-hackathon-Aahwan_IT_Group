@@ -291,6 +291,28 @@ app.post('/api/pizza-tts', (req, res) => {
   });
 });
 
+app.get('/api/traction', async (req, res) => {
+  try {
+    const [custRows] = await pool.query("SELECT COUNT(*) AS total_customers, SUM(current_points) AS current_points FROM loyalty_customers");
+    const [pointsRows] = await pool.query("SELECT SUM(points) AS total_earned FROM loyalty_transactions WHERE transaction_type = 'earn'");
+    const [storeRows] = await pool.query("SELECT name, active FROM stores");
+    
+    // Group customers by program_id/category_id if needed. For now, let's just send the breakdown if we had it.
+    // Since we don't have exact store_ids in loyalty_customers, we'll just return the total.
+    
+    res.json({
+      success: true,
+      total_customers: custRows[0].total_customers || 0,
+      total_points: pointsRows[0].total_earned || 0,
+      current_points_balance: custRows[0].current_points || 0,
+      shops: storeRows || []
+    });
+  } catch (err) {
+    console.error('Traction API Error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to fetch traction' });
+  }
+});
+
 app.listen(process.env.PORT, () => {
   console.log('🚀 Hackathon Demo running on port ' + process.env.PORT);
 });

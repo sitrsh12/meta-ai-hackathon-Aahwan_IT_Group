@@ -5,6 +5,12 @@
 
 **Demo:** [90s Loom - TODO] | **Live:** [https://whatsapp.zappertrip.com/hackathon/pizza-voice](https://whatsapp.zappertrip.com/hackathon/pizza-voice)
 
+
+## 🌐 Live Demos
+- **Voice Agent UI:** [https://whatsapp.zappertrip.com/hackathon/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
+- **Owner Dashboard (Live Orders):** [https://whatsapp.zappertrip.com/hackathon/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
+- **Traction Dashboard (Live Metrics):** [https://whatsapp.zappertrip.com/hackathon/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
+
 ### Problem
 Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic, and generic bots fail on Nepali accent + Hinglish. Pizza Ghar understands messy spoken language, matches to a real MySQL menu, and frees the owner.
 
