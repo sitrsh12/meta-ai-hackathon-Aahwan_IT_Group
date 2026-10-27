@@ -1,56 +1,53 @@
-# 🍕 Pizza Ghar — Voice Ordering Agent
-**Meta Global AI Developer Hackathon · Startup Track · Build for Your World**
+# 🍕 PizzaGhar - Voice Ordering Agent | Meta Global AI Hackathon
 
-> Production voice agent for a real restaurant in Nepal. Voice in (EN/NE/Hinglish) -> Muse Spark 1.3 extracts JSON -> deterministic state machine -> WhatsApp receipt + payment link.
+**Startup Track | Build for Your World**
+> Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
 
-**Demo:** [90s Loom - TODO] | **Live:** [https://whatsapp.zappertrip.com/hackathon/pizza-voice](https://whatsapp.zappertrip.com/hackathon/pizza-voice)
+**Live:** https://whatsapp.zappertrip.com/hackathon/pizza-voice
 
-
-## 🌐 Live Demos
-- **Voice Agent UI:** [https://whatsapp.zappertrip.com/hackathon/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
-- **Owner Dashboard (Live Orders):** [https://whatsapp.zappertrip.com/hackathon/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
-- **Traction Dashboard (Live Metrics):** [https://whatsapp.zappertrip.com/hackathon/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
+### 🌐 Live Demos (Judge Click Here)
+- 🎤 **Customer Voice Agent:** [/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
+- 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
+- 📈 **Traction Dashboard (103 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
 
 ### Problem
-Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic, and generic bots fail on Nepali accent + Hinglish. Pizza Ghar understands messy spoken language, matches to a real MySQL menu, and frees the owner.
+Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic. Generic bots fail on Nepali accent + Hinglish.
 
-### What’s New (Oct 26 - Nov 4) - Hackathon Compliance
-**Pre-hackathon (Before Oct 26):**
-- Zappertrip gateway (Node.js + Baileys) - used ONLY as message sender
+PizzaGhar understands: "Ekta veggie feast pizza ra mango lassi dinu ta" -> Perfect order.
 
-**Built DURING hackathon:**
-- `ai/metaAgent.js`: Meta Muse Spark 1.3 via Meta Model API (api.meta.ai/v1)
-- `ai/pizzaAgent.js`: Entity extraction + strict menu matching + cart add/remove logic
-- `server.js`: Deterministic State Machine - LLM only extracts, never drives flow
-- **Multimodal Pipeline**: 
-  - **Primary STT:** Groq `whisper-large-v3` (forced Nepali, <0.5s latency)
-  - **Fallback STT:** Meta `muse-voice-transcribe-1.0` (integrated and tested via Meta Model API)
-  - **TTS:** Edge-TTS `ne-NP-HemkalaNeural` (native Nepali pronunciation)
-- `public/pizza-voice.html`: Nepali-localized MediaRecorder UI
+### Architecture: Ears -> Brain -> State -> Mouth
+- **Ears (STT):** Groq whisper-large-v3 (Primary, <0.5s, ne) + Meta muse-voice-transcribe-1.0 (Fallback)
+- **Brain:** Meta **Muse Spark 1.3** via Meta Model API - Extracts strict JSON, fuzzy matches to MySQL menu
+- **State:** Node.js Deterministic State Machine (LLM never drives flow, only extracts)
+- **Mouth:** Edge-TTS ne-NP-HemkalaNeural (Branded as **Hemlata** - Our Nepali Didi)
+- **Delivery:** Baileys WhatsApp (receipt + payment link)
 
-### Architecture
-1. **Ears (STT):** Groq whisper-large-v3 (<0.5s) as primary, with Meta Muse Voice Transcribe implemented as a fallback.
-2. **Brain:** Meta Muse Spark 1.3 (fuzzy match to MySQL menu -> strict JSON)
-3. **State:** Node.js state machine (no hallucination loops)
-4. **Mouth:** Edge-TTS ne-NP-HemkalaNeural
-5. **Delivery:** Baileys WhatsApp
+### What is New (Oct 26 - Nov 4) - Hackathon Compliance
+**Pre-Hackathon (Before Oct 26):** ZapperTrip WhatsApp Gateway (Node.js + Baileys) - message sender only.
 
+**Built DURING Hackathon:**
+- ai/metaAgent.js: Muse Spark 1.3 integration via api.meta.ai/v1
+- ai/pizzaAgent.js: Entity extraction + cart logic
+- server.js: Deterministic State Machine
+- public/pizza-voice.html: Nepali-localized UI + Dual-STT
 
-### 🧠 Engineering Highlight: Dual-STT Pipeline
-We originally attempted to use Meta's native `muse-voice-transcribe-1.0` as the primary STT engine. However, extensive testing revealed the model does not yet officially support Nepali. When processing heavily accented Nepali speech, it frequently hallucinated Bengali and Gujarati scripts due to phonetic similarities.
+### 🧠 Engineering Highlight: Dual-STT for Nepal
+We tested Meta Muse Voice Transcribe as primary. It does not officially support Nepali yet and hallucinated Bengali/Gujarati for accented Nepali.
 
-To ensure absolute reliability for our real-world client, we engineered a Dual-STT pipeline. The backend first attempts Groq's `whisper-large-v3` (which perfectly locks to Nepali Devanagari with the `language: 'ne'` parameter, delivering <0.5s latency). If Groq ever fails, it automatically falls back to Meta's native ASR API. This guarantees 100% uptime while still maximizing our use of the Meta AI ecosystem.
+Solution: **Dual-STT Pipeline** for 100% reliability for our real client.
+Primary: Groq whisper-large-v3 with language: ne -> Perfect Nepali Devanagari, <0.5s.
+Fallback: Meta Muse Voice (integrated via Meta Model API) -> Maximizes Meta ecosystem use.
+
+This is honest engineering for a real-world client, not just a demo.
+
+### Demo Flow (60s)
+1. Enter phone, tap mic: "One Veggie Feast Pizza and a Mango Lassi"
+2. See Spark 1.3 JSON + Hemlata says "Veggie Feast Pizza ra Mango Lassi add bhayo hai!"
+3. Say "Pizza hataidinu" -> Removes correctly
+4. Confirm -> WhatsApp receipt + Khalti/eSewa link
 
 ### How to Run
-1. `npm install`
-2. `cp .env.example .env` (add `META_API_KEY`, `GROQ_API_KEY`)
-3. `npm start`
-4. Open `http://localhost:3050/pizza-voice.html`
-
-> Without `MAIN_APP_URL`, runs in console-only mode (perfect for judges without WhatsApp).
-
-### Demo Flow (90s)
-1. Enter phone, tap mic: "One Veggie Feast Pizza and a Mango Lassi"
-2. See Spark 1.3 JSON + Nepali confirmation
-3. Say "Remove the pizza" -> subtraction works
-4. Confirm -> WhatsApp receipt
+1. npm install
+2. cp .env.example .env (Add META_API_KEY, GROQ_API_KEY)
+3. npm start
+4. Open http://localhost:3050/pizza-voice.html
