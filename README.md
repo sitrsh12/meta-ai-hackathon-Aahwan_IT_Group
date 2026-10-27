@@ -13,7 +13,7 @@
 ### Problem
 Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic. Generic bots fail on Nepali accent + Hinglish.
 
-PizzaGhar understands: "Ekta veggie feast pizza ra mango lassi dinu ta" -> Perfect order.
+PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perfect order.
 
 ### Architecture: Ears -> Brain -> State -> Mouth
 - **Ears (STT):** Groq whisper-large-v3 (Primary, <0.5s, ne) + Meta muse-voice-transcribe-1.0 (Fallback)
