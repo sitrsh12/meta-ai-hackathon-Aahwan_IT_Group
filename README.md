@@ -1,5 +1,10 @@
 # 🍕 PizzaGhar - Voice Ordering Agent | Meta Global AI Hackathon
 
+![Live](https://img.shields.io/badge/LIVE-Birtamode_Jhapa-green)
+![Meta](https://img.shields.io/badge/Model-Muse_Spark_1.3-blue)
+![Traction](https://img.shields.io/badge/Traction-114_Customers-orange)
+![STT](https://img.shields.io/badge/STT-Groq_Whisper_v3-purple)
+
 **Startup Track | Build for Your World**
 > Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
 
