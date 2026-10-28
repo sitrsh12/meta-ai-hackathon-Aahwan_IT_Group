@@ -93,6 +93,7 @@ app.post('/api/pizza-order', async (req, res) => {
     if (!confirmed) {
       // Check if they have Pizza but no Drink
       const hasPizza = found.some(function(m) { return m.found.toLowerCase().indexOf('pizza') !== -1; });
+      const hasBurger = found.some(function(m) { return m.found.toLowerCase().indexOf('burger') !== -1; });
       const hasDrink = found.some(function(m) { 
         var n = m.found.toLowerCase();
         return n.indexOf('lassi') !== -1 || n.indexOf('juice') !== -1 || n.indexOf('shake') !== -1 || n.indexOf('soda') !== -1 || n.indexOf('coke') !== -1 || n.indexOf('pepsi') !== -1 || n.indexOf('fanta') !== -1 || n.indexOf('sprite') !== -1 || n.indexOf('tea') !== -1 || n.indexOf('coffee') !== -1 || n.indexOf('water') !== -1;
@@ -101,6 +102,8 @@ app.post('/api/pizza-order', async (req, res) => {
       let upsell = '';
       if (hasPizza && !hasDrink) {
         upsell = ' तपाईंको अर्डरमा पिज्जा छ, के म्यांगो लस्सी (Rs 190) पनि थप्न चाहनुहुन्छ?';
+      } else if (hasBurger && !hasDrink) {
+        upsell = ' तपाईंको अर्डरमा बर्गर छ, के फ्रेन्च फ्राइज (Rs 220) वा कोक (Rs 90) पनि थप्न चाहनुहुन्छ?';
       }
 
       return res.json({ success: true, reply: 'जम्मा रु ' + total + ' भयो (' + summary + ')।' + upsell + ' कन्फम बटन थिचेर कन्फम गर्नुहोस या मेनु बटन थिचेर अन्य आइटम हेरी थप्न या घटाउन पनि सक्नुहुन्छ', booking_confirmed: false, step: 'CONFIRMING', cart: found, total: total });
