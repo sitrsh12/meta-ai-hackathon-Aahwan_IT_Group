@@ -9,8 +9,7 @@
 > Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
 
 **Live:** https://whatsapp.zappertrip.com/hackathon/pizza-voice
-**Demo Video:** `[Add 3-Minute Loom Link Here Before Nov 4]`
-**Built by:** Sitesh Adhikari (sitrsh12@gmail.com)
+**Demo Video:** Coming soon.
 
 <div align="left">
   <a href="https://whatsapp.zappertrip.com/hackathon/pizza-voice.html">
