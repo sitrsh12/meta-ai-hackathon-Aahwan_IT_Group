@@ -9,6 +9,8 @@
 > Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
 
 **Live:** https://whatsapp.zappertrip.com/hackathon/pizza-voice
+**Demo Video:** `[Add 3-Minute Loom Link Here Before Nov 4]`
+**Built by:** Sitesh Adhikari (sitrsh12@gmail.com)
 
 <div align="left">
   <a href="https://whatsapp.zappertrip.com/hackathon/pizza-voice.html">
@@ -33,6 +35,12 @@
 Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic. Generic bots fail on Nepali accent + Hinglish.
 
 PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perfect order.
+
+### 💼 Business Impact & Scale
+- **Current Traction:** 5 live shops, 115 active customers, 21,000+ loyalty points distributed.
+- **Business Model (SaaS):** We charge a subscription of **Rs 1,500/month** per shop (or 1% transaction fee). 
+- **Target Market:** There are **50,000+** registered restaurants and cafes in Nepal alone. If we capture just 1% of this market, it represents Rs 75 Lakhs in MRR.
+- **Why Meta AI?** Without Muse Spark's strict JSON extraction and Groq's fast Nepali transcription, this voice pipeline would be too slow and expensive to run on a profit margin at this scale.
 
 ### Architecture: Ears -> Brain -> State -> Mouth
 - **Ears (STT):** Groq whisper-large-v3 (Primary, <0.5s, ne) + Meta muse-voice-transcribe-1.0 (Fallback)
@@ -67,6 +75,14 @@ This is honest engineering for a real-world client, not just a demo.
 4. Confirm -> Order instantly pops up on the **Live Owner Dashboard** (Yellow PENDING)
 5. Click the WhatsApp payment link -> Complete mock eSewa/Khalti checkout
 6. Watch the Owner Dashboard instantly flip the order to **Green PAID** in real-time
+
+### 🛠️ Tech Stack
+- **Backend:** Node.js, Express
+- **Database:** MySQL (`mysql2`)
+- **AI Models:** Meta Model API (`muse-spark-1.3`, `muse-voice-transcribe-1.0`)
+- **Speech (STT/TTS):** Groq Whisper v3, Edge-TTS
+- **Messaging:** Baileys (WhatsApp)
+- **Frontend:** Vanilla JS, Tailwind CSS
 
 ### How to Run
 1. npm install
