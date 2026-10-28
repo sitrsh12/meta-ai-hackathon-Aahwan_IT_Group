@@ -306,9 +306,12 @@ function startCall() {
       };
 
       mediaRecorder.onstop = () => {
-        const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+        // Safely release the mic AFTER the audio data is collected
+        stream.getTracks().forEach(track => track.stop());
+
+        const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
         const formData = new FormData();
-        formData.append('audio', audioBlob, 'voice.webm');
+        formData.append('audio', audioBlob, 'voice.' + (audioBlob.type.split('/')[1] || 'webm'));
 
         statusEl.innerText = 'प्रोसेस हुँदैछ...';
         micVisual.className = 'mic-container processing';
@@ -341,7 +344,7 @@ function startCall() {
       setTimeout(() => {
         if (mediaRecorder.state === 'recording') {
           mediaRecorder.stop();
-          stream.getTracks().forEach(track => track.stop()); // Release mic
+          // DO NOT stop tracks here. Let onstop handle it safely.
         }
       }, 6000);
 
