@@ -75,6 +75,11 @@ input.namebox { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-ra
 <h2 id="status">बोल्न थिच्नुहोस्</h2>
 <p id="aiReply">पिज्जा घरमा स्वागत छ। के अर्डर गर्नुहुन्छ?</p>
 <button onclick="startCall()" id="callBtn">🎙️ बोल्नुहोस्</button>
+<div id="textFallbackContainer" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+  <p style="font-size: 13px; color: #64748b; margin-bottom: 8px;">माइकले काम नगरे यहाँ टाइप गर्नुहोस्:</p>
+  <input type="text" id="manualTextInput" placeholder="जस्तै: Euta Veggie Pizza" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px;">
+  <button onclick="submitManualText()" style="background: #0f172a; margin-top: 0; font-size: 14px; padding: 12px;">पठाउनुहोस् (Send)</button>
+</div>
 <button onclick="confirmOrder()" id="confirmBtn" class="confirm-btn">✅ अर्डर कन्फर्म गर्नुहोस्</button>
 <button onclick="resetOrder()" id="resetBtn" class="reset-btn">🔄 नयाँ अर्डर</button>
 <button onclick="window.open('https://whatsapp.zappertrip.com/store/5', '_blank')" style="background:#2563eb; margin-top:10px; font-size:15px; padding:14px; font-weight:bold; border-radius:50px; color:white; border:none; width:100%; cursor:pointer;">📖 मेनु हेर्नुहोस्</button>
@@ -244,6 +249,7 @@ async function processBackend(userText, confirmed) {
       confirmBtn.style.display = 'none';
       callBtn.style.display = 'none';
       micVisual.style.display = 'none';
+      document.getElementById('textFallbackContainer').style.display = 'none';
       resetBtn.style.display = 'block';
     } else {
       // DO NOT clear lastOrderText here. If the AI fails to hear an addition, 
@@ -265,6 +271,15 @@ async function processBackend(userText, confirmed) {
     }
   }
 }
+function submitManualText() {
+  var input = document.getElementById('manualTextInput');
+  var text = input.value.trim();
+  if (!text) { alert('कृपया केही टाइप गर्नुहोस्।'); return; }
+  
+  input.value = ''; // Clear input
+  processBackend(text, false);
+}
+
 function confirmOrder() {
   if (!lastOrderText) { alert('Pahila order bolnus.'); return; }
   confirmBtn.disabled = true;
