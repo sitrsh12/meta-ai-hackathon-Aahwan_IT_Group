@@ -11,6 +11,14 @@
 **Live:** https://whatsapp.zappertrip.com/hackathon/pizza-voice
 
 ### 🌐 Live Demos (Judge Click Here)
+
+<div align="left">
+  <a href="https://whatsapp.zappertrip.com/hackathon/pizza-voice.html">
+    <img src="https://raw.githubusercontent.com/sitrsh12/meta-ai-hackathon-Aahwan_IT_Group/main/public/qr.png" alt="Scan to try the Voice Agent" width="150" style="border-radius: 12px; border: 2px solid #eee;" />
+  </a>
+  <p><em>📱 Scan with your phone to try the live Voice Agent instantly.</em></p>
+</div>
+
 - 🎤 **Customer Voice Agent:** [/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
 - 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
 - 📈 **Traction Dashboard (115 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
