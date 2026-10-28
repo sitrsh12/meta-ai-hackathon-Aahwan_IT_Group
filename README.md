@@ -46,6 +46,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 - **Brain:** Meta **Muse Spark 1.3** via Meta Model API - Extracts strict JSON, fuzzy matches to MySQL menu
 - **State:** Node.js Deterministic State Machine (The LLM only *extracts* JSON to support the flow, it **never executes or drives it**, completely preventing AI hallucinations and loops)
 - **Mouth:** Edge-TTS ne-NP-HemkalaNeural (Branded as **Hemlata** - Our Nepali Didi)
+- **Agentic Upsell:** If a user orders a Pizza but no drink, the Node.js State Machine autonomously injects a prompt to add a Mango Lassi, acting as a revenue-generating salesperson.
 - **Delivery:** Baileys WhatsApp (receipt + payment link)
 - **Operations:** Live Owner Dashboard (auto-refreshes every 3s) + Payment Gateway Lifecycle (Pending -> Paid)
 
@@ -68,12 +69,13 @@ Fallback: Meta Muse Voice (integrated via Meta Model API) -> Maximizes Meta ecos
 This is honest engineering for a real-world client, not just a demo.
 
 ### Demo Flow (60s)
-1. Enter phone, tap mic: "One Veggie Feast Pizza and a Mango Lassi"
-2. See Spark 1.3 JSON + Hemlata says "Veggie Feast Pizza ra Mango Lassi add bhayo hai!"
-3. Say "Pizza hataidinu" -> Removes correctly
-4. Confirm -> Order instantly pops up on the **Live Owner Dashboard** (Yellow PENDING)
-5. Click the WhatsApp payment link -> Complete mock eSewa/Khalti checkout
-6. Watch the Owner Dashboard instantly flip the order to **Green PAID** in real-time
+1. Enter phone, tap mic: "One Veggie Feast Pizza" (Without a drink)
+2. **Agentic Upsell:** Hemlata autonomously suggests "के म्यांगो लस्सी (Rs 190) पनि थप्न चाहनुहुन्छ?"
+3. Say "Ho, thapnus" -> Lassi is added to the cart
+4. Say "Pizza hataidinu" -> Removes correctly
+5. Confirm -> Order instantly pops up on the **Live Owner Dashboard** (Yellow PENDING)
+6. Click the WhatsApp payment link -> Complete mock eSewa/Khalti checkout
+7. Watch the Owner Dashboard instantly flip the order to **Green PAID** in real-time
 
 ### 🛠️ Tech Stack
 - **Backend:** Node.js, Express
