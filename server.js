@@ -89,9 +89,21 @@ app.post('/api/pizza-order', async (req, res) => {
       return m.qty + ' ' + npName + ' रु ' + m.line_total; 
     }).join(', ');
 
-    // Step CONFIRMING
+    // Step CONFIRMING (with Agentic Upsell)
     if (!confirmed) {
-      return res.json({ success: true, reply: 'जम्मा रु ' + total + ' भयो (' + summary + ')। कन्फम बटन थिचेर कन्फम गर्नुहोस या मेनु बटन थिचेर अन्य आइटम हेरी थप्न या घटाउन पनि सक्नुहुन्छ', booking_confirmed: false, step: 'CONFIRMING', cart: found, total: total });
+      // Check if they have Pizza but no Drink
+      const hasPizza = found.some(function(m) { return m.found.toLowerCase().indexOf('pizza') !== -1; });
+      const hasDrink = found.some(function(m) { 
+        var n = m.found.toLowerCase();
+        return n.indexOf('lassi') !== -1 || n.indexOf('juice') !== -1 || n.indexOf('shake') !== -1 || n.indexOf('soda') !== -1 || n.indexOf('coke') !== -1 || n.indexOf('pepsi') !== -1 || n.indexOf('fanta') !== -1 || n.indexOf('sprite') !== -1 || n.indexOf('tea') !== -1 || n.indexOf('coffee') !== -1 || n.indexOf('water') !== -1;
+      });
+      
+      let upsell = '';
+      if (hasPizza && !hasDrink) {
+        upsell = ' तपाईंको अर्डरमा पिज्जा छ, के म्यांगो लस्सी (Rs 190) पनि थप्न चाहनुहुन्छ?';
+      }
+
+      return res.json({ success: true, reply: 'जम्मा रु ' + total + ' भयो (' + summary + ')।' + upsell + ' कन्फम बटन थिचेर कन्फम गर्नुहोस या मेनु बटन थिचेर अन्य आइटम हेरी थप्न या घटाउन पनि सक्नुहुन्छ', booking_confirmed: false, step: 'CONFIRMING', cart: found, total: total });
     }
 
     // Step BOOKED - Node writes DB, sends WA
@@ -158,10 +170,12 @@ app.get('/api/traction', async (req, res) => {
 app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No audio file' });
 
-  // 1. Try Groq (Primary - Best Nepali support)
+  console.log('🎤 Received audio. Size:', req.file.size, 'Type:', req.file.mimetype);
+
+  // 1. Try Groq FIRST (Best for Android/WebM)
   try {
     const formData = new FormData();
-    const blob = new Blob([req.file.buffer], { type: 'audio/webm' });
+    const blob = new Blob([req.file.buffer], { type: req.file.mimetype || 'audio/webm' });
     formData.append('file', blob, 'audio.webm');
     formData.append('model', 'whisper-large-v3');
     formData.append('language', 'ne'); 
@@ -175,20 +189,23 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     if (groqRes.ok) {
       const groqData = await groqRes.json();
       console.log('🎤 [GROQ ASR RESULT]', groqData.text);
-      return res.json({ text: groqData.text, source: 'groq' });
+      if (groqData.text && groqData.text.trim().length > 0) {
+        return res.json({ text: groqData.text, source: 'groq' });
+      }
+    } else {
+      console.log('Groq API failed:', await groqRes.text());
     }
-    console.warn('Groq STT failed, falling back to Meta...');
   } catch (err) {
     console.warn('Groq STT error:', err.message);
   }
 
   // 2. Try Meta (Fallback)
-  const inputPath = `/tmp/meta_in_${Date.now()}.webm`;
+  const inputPath = `/tmp/meta_in_${Date.now()}.raw`;
   const outputPath = `/tmp/meta_out_${Date.now()}.wav`;
   try {
     fs.writeFileSync(inputPath, req.file.buffer);
     await execPromise(`ffmpeg -i ${inputPath} -ar 16000 -ac 1 -c:a pcm_s16le ${outputPath} -y`);
-
+    
     const audioBuffer = fs.readFileSync(outputPath);
     const metaForm = new FormData();
     const requestPayload = JSON.stringify({
@@ -209,7 +226,9 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     if (metaRes.ok) {
       const metaData = await metaRes.json();
       console.log('🎤 [META ASR RESULT]', metaData.transcript);
-      return res.json({ text: metaData.transcript, source: 'meta' });
+      if (metaData.transcript && metaData.transcript.trim().length > 0) {
+        return res.json({ text: metaData.transcript, source: 'meta' });
+      }
     }
   } catch (err) {
     console.error('Meta STT error:', err.message);
@@ -218,8 +237,9 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     if (fs.existsSync(outputPath)) fs.unlinkSync(outputPath);
   }
 
-  return res.status(500).json({ error: 'All transcription services failed' });
+  return res.status(500).json({ error: 'All transcription services failed or returned empty text' });
 });
+
 
 app.get('/api/owner/orders', async (req, res) => {
   try {
@@ -234,15 +254,41 @@ app.get('/api/owner/orders', async (req, res) => {
 app.post('/api/pay-confirm', async (req, res) => {
   try {
     const { phone, order_id } = req.body;
-    
+    let targetOrderId = order_id;
+
     if (order_id) {
       console.log('💰 [PAY-CONFIRM HIT] Confirming specific Order ID:', order_id);
       await dbQuery("UPDATE catalog_orders SET status = 'processing' WHERE id = ?", [order_id]);
     } else if (phone) {
       console.log('💰 [PAY-CONFIRM HIT] Confirming by phone:', phone);
+      const pending = await dbQuery("SELECT id FROM catalog_orders WHERE retailer_phone = ? AND status = 'pending' ORDER BY id DESC LIMIT 1", [phone]);
+      if (pending.length > 0) {
+        targetOrderId = pending[0].id;
+      }
       await dbQuery("UPDATE catalog_orders SET status = 'processing' WHERE retailer_phone = ? AND status = 'pending' ORDER BY id DESC LIMIT 1", [phone]);
     } else {
       return res.status(400).json({ success: false, error: 'Order ID or Phone required' });
+    }
+
+    // Send the WhatsApp Receipt
+    if (targetOrderId) {
+      try {
+        const orderData = await dbQuery("SELECT total, retailer_name FROM catalog_orders WHERE id = ?", [targetOrderId]);
+        if (orderData.length > 0) {
+          const total = orderData[0].total;
+          const name = orderData[0].retailer_name || 'Customer';
+          
+          const waMessage = '✅ *Payment Received!*\n\nधन्यवाद ' + name + '!\nतपाईंको अर्डर #' + targetOrderId + ' (रु ' + total + ') को भुक्तानी सफल भयो। हामी चाँडै खाना पठाउनेछौं।';
+          
+          fetch(`${process.env.MAIN_APP_URL || 'http://127.0.0.1:3010'}${process.env.MAIN_APP_SEND_WA_PATH || '/api/ai-demo/send-wa'}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: phone, message: waMessage })
+          }).catch(function(e) { console.error('[WA Pay Receipt Failed]', e.message); });
+        }
+      } catch (e) {
+        console.error('Failed to fetch order for WA receipt:', e);
+      }
     }
     
     res.json({ success: true });

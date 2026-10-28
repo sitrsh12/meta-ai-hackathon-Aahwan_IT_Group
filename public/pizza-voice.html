@@ -161,19 +161,37 @@ function speak(text) {
   })
   .then(res => {
     if (!res.ok) throw new Error('TTS API failed');
-    return res.blob();
+    return res.arrayBuffer();
   })
-  .then(blob => {
-    const audioUrl = URL.createObjectURL(blob);
-    const audio = new Audio(audioUrl);
-    audio.onended = function() {
+  .then(arrayBuffer => {
+    if (!window.audioCtx) {
+      window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (window.audioCtx.state === 'suspended') {
+      window.audioCtx.resume();
+    }
+
+    window.audioCtx.decodeAudioData(arrayBuffer, function(buffer) {
+      var source = window.audioCtx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(window.audioCtx.destination);
+      
+      source.onended = function() {
+        micVisual.className = 'mic-container';
+        micVisual.innerText = '🎙️';
+        statusEl.innerText = 'फेरि बोल्नुहोस्';
+        callBtn.disabled = false;
+        callBtn.innerText = '🎙️ फेरि बोल्नुहोस्';
+      };
+      source.start(0);
+    }, function(err) {
+      console.error('Audio decode failed:', err);
       micVisual.className = 'mic-container';
       micVisual.innerText = '🎙️';
       statusEl.innerText = 'फेरि बोल्नुहोस्';
       callBtn.disabled = false;
       callBtn.innerText = '🎙️ फेरि बोल्नुहोस्';
-    };
-    audio.play();
+    });
   })
   .catch(err => {
     console.error('Audio playback failed', err);
@@ -194,17 +212,30 @@ function speak(text) {
 async function processBackend(userText, confirmed) {
   statusEl.innerText = 'प्रोसेस हुँदैछ...';
   aiReplyEl.innerText = 'Sochdei chhu...';
-  micVisual.className = 'mic-container';
+  micVisual.className = 'mic-container processing';
+  micVisual.innerText = '🧠';
+  
   if (!confirmed) { chatHistory.push({ role: 'user', content: userText }); }
+  
   try {
     let sendText = confirmed ? lastOrderText : userText;
+    
+    // Add a 15-second timeout to prevent infinite hanging
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    
     let res = await fetch('/hackathon/api/pizza-order', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
+      signal: controller.signal,
       body: JSON.stringify({ text: sendText, phone: judgePhone, name: judgeName, history: chatHistory, confirmed: confirmed === true })
     });
+    
+    clearTimeout(timeoutId); // Clear timer if fetch succeeds
+    
     let data = await res.json();
     chatHistory.push({ role: 'assistant', content: data.reply });
+    
     if (!confirmed && data.step === 'CONFIRMING') {
       lastOrderText = userText;
       pendingTotal = data.total || 0;
@@ -215,11 +246,24 @@ async function processBackend(userText, confirmed) {
       micVisual.style.display = 'none';
       resetBtn.style.display = 'block';
     } else {
-      if (data.step === 'TAKING_ORDER' && !confirmed) { lastOrderText = ''; }
+      // DO NOT clear lastOrderText here. If the AI fails to hear an addition, 
+      // we don't want to delete the user's entire cart.
       confirmBtn.style.display = 'none';
     }
+    
     speak(data.reply);
-  } catch (err) { speak('Maaf garnus, server sanga connection chutyo.'); }
+    
+  } catch (err) {
+    console.error('Process Error:', err);
+    micVisual.className = 'mic-container';
+    micVisual.innerText = '🎙️';
+    
+    if (err.name === 'AbortError') {
+      speak('माफ गर्नुहोस्, सिस्टमले ढिलो गर्यो। फेरि बोल्नुहोस्।');
+    } else {
+      speak('माफ गर्नुहोस्, सर्भरसँग कुरा गर्न सकिएन। फेरि बोल्नुहोस्।');
+    }
+  }
 }
 function confirmOrder() {
   if (!lastOrderText) { alert('Pahila order bolnus.'); return; }
@@ -230,6 +274,21 @@ let mediaRecorder;
 let audioChunks = [];
 
 function startCall() {
+  // Unlock speaker for iOS (Does NOT affect microphone)
+  try {
+    if (!window.audioCtx) {
+      window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (window.audioCtx.state === 'suspended') {
+      window.audioCtx.resume();
+    }
+    var buffer = window.audioCtx.createBuffer(1, 1, 22050);
+    var source = window.audioCtx.createBufferSource();
+    source.buffer = buffer;
+    source.connect(window.audioCtx.destination);
+    source.start(0);
+  } catch(e) { console.log('AudioCtx unlock failed', e); }
+
   window.speechSynthesis.cancel();
   callBtn.disabled = true;
   callBtn.innerText = 'सुन्दैछु...';
