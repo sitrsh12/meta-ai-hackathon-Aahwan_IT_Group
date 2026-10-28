@@ -44,7 +44,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 ### Architecture: Ears -> Brain -> State -> Mouth
 - **Ears (STT):** Groq whisper-large-v3 (Primary, <0.5s, ne) + Meta muse-voice-transcribe-1.0 (Fallback)
 - **Brain:** Meta **Muse Spark 1.3** via Meta Model API - Extracts strict JSON, fuzzy matches to MySQL menu
-- **State:** Node.js Deterministic State Machine (LLM never drives flow, only extracts)
+- **State:** Node.js Deterministic State Machine (The LLM only *extracts* JSON to support the flow, it **never executes or drives it**, completely preventing AI hallucinations and loops)
 - **Mouth:** Edge-TTS ne-NP-HemkalaNeural (Branded as **Hemlata** - Our Nepali Didi)
 - **Delivery:** Baileys WhatsApp (receipt + payment link)
 - **Operations:** Live Owner Dashboard (auto-refreshes every 3s) + Payment Gateway Lifecycle (Pending -> Paid)
@@ -55,7 +55,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 **Built DURING Hackathon:**
 - ai/metaAgent.js: Muse Spark 1.3 integration via api.meta.ai/v1
 - ai/pizzaAgent.js: Entity extraction + cart logic
-- server.js: Deterministic State Machine
+- server.js: Deterministic State Machine - LLM only extracts, never executes the flow (Zero Hallucinations)
 - public/pizza-voice.html: Nepali-localized UI + Dual-STT
 
 ### 🧠 Engineering Highlight: Dual-STT for Nepal
