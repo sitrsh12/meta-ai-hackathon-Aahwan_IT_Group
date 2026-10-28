@@ -261,11 +261,14 @@
         Aahwan Loyalty · Customer Loyalty Platform · Jhapa, Nepal · Live since Sept 2024 <span class="nepal-flag">🇳🇵</span>
       </p>
     </div>
-    <div class="brand">
-      <div class="logo-btn" id="speakBtn" title="Click to hear live traction">✓</div>
-      <div class="brand-text">
-        <b>Aahwan Loyalty</b>
-        <small>Rewards · Repeat · Grow</small>
+    <div class="brand" style="display:flex; align-items:center; gap:24px;">
+      <a href="/hackathon/owner.html" style="color:var(--text-secondary); text-decoration:none; font-size:13px; font-weight:600; transition:color 0.2s; white-space:nowrap;" onmouseover="this.style.color='var(--accent-green)'" onmouseout="this.style.color='var(--text-secondary)'">🍕 View Live Orders</a>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div class="logo-btn" id="speakBtn" title="Click to hear live traction">✓</div>
+        <div class="brand-text">
+          <b>Aahwan Loyalty</b>
+          <small>Rewards · Repeat · Grow</small>
+        </div>
       </div>
     </div>
   </div>
@@ -330,7 +333,7 @@ async function fetchTraction() {
     document.getElementById('current-points').innerText = `${Number(data.current_points_balance).toLocaleString()} pts`;
 
     // Update Shops
-    const activeShops = data.shops.filter(s => s.active == 1);
+    const activeShops = data.shops.filter(s => s.active == 1 && s.name !== 'zappertrip' && s.name !== 'Aahwan IT Group Pvt Ltd');
     document.getElementById('shop-count').innerText = activeShops.length;
 
     const headingEl = document.getElementById('live-shops-heading');

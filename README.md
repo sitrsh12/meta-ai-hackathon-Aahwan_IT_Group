@@ -2,7 +2,7 @@
 
 ![Live](https://img.shields.io/badge/LIVE-Birtamode_Jhapa-green)
 ![Meta](https://img.shields.io/badge/Model-Muse_Spark_1.3-blue)
-![Traction](https://img.shields.io/badge/Traction-114_Customers-orange)
+![Traction](https://img.shields.io/badge/Traction-115_Customers-orange)
 ![STT](https://img.shields.io/badge/STT-Groq_Whisper_v3-purple)
 
 **Startup Track | Build for Your World**
@@ -13,7 +13,7 @@
 ### 🌐 Live Demos (Judge Click Here)
 - 🎤 **Customer Voice Agent:** [/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
 - 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
-- 📈 **Traction Dashboard (103 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
+- 📈 **Traction Dashboard (115 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
 
 ### 🏪 Real Client Consent - VERIFIED
 **Client:** PizzaGhar, Birtamode, Jhapa, Nepal  
@@ -32,6 +32,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 - **State:** Node.js Deterministic State Machine (LLM never drives flow, only extracts)
 - **Mouth:** Edge-TTS ne-NP-HemkalaNeural (Branded as **Hemlata** - Our Nepali Didi)
 - **Delivery:** Baileys WhatsApp (receipt + payment link)
+- **Operations:** Live Owner Dashboard (auto-refreshes every 3s) + Payment Gateway Lifecycle (Pending -> Paid)
 
 ### What is New (Oct 26 - Nov 4) - Hackathon Compliance
 **Pre-Hackathon (Before Oct 26):** ZapperTrip WhatsApp Gateway (Node.js + Baileys) - message sender only.
@@ -55,7 +56,9 @@ This is honest engineering for a real-world client, not just a demo.
 1. Enter phone, tap mic: "One Veggie Feast Pizza and a Mango Lassi"
 2. See Spark 1.3 JSON + Hemlata says "Veggie Feast Pizza ra Mango Lassi add bhayo hai!"
 3. Say "Pizza hataidinu" -> Removes correctly
-4. Confirm -> WhatsApp receipt + Khalti/eSewa link
+4. Confirm -> Order instantly pops up on the **Live Owner Dashboard** (Yellow PENDING)
+5. Click the WhatsApp payment link -> Complete mock eSewa/Khalti checkout
+6. Watch the Owner Dashboard instantly flip the order to **Green PAID** in real-time
 
 ### How to Run
 1. npm install

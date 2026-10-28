@@ -36,8 +36,6 @@ function formatSpokenDate(dateStr) {
     return d.toLocaleDateString('en-US', { month: 'long', day: 'numeric' });
 }
 
-app.get('/ai-demo', (req, res) => res.sendFile(path.join(__dirname, 'public', 'ai-demo.html')));
-app.get('/voice-demo', (req, res) => res.sendFile(path.join(__dirname, 'public', 'voice-demo.html')));
 app.get('/pay', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pay.html')));
 app.get('/pizza-voice', (req, res) => res.sendFile(path.join(__dirname, 'public', 'pizza-voice.html')));
 
@@ -97,11 +95,13 @@ app.post('/api/pizza-order', async (req, res) => {
     }
 
     // Step BOOKED - Node writes DB, sends WA
+    let orderId = '';
     try {
-      await dbQuery("INSERT INTO catalog_orders (store_id, retailer_name, retailer_phone, total, status, shop_name, order_note) VALUES (?, ?, ?, ?, 'pending', ?, ?)", [5, customerName, phone, total, 'Pizza Ghar', JSON.stringify(found)]);
+      const dbResult = await dbQuery("INSERT INTO catalog_orders (store_id, retailer_name, retailer_phone, total, status, shop_name, order_note) VALUES (?, ?, ?, ?, 'pending', ?, ?)", [5, customerName, phone, total, 'Pizza Ghar', JSON.stringify(found)]);
+      orderId = dbResult.insertId;
     } catch (dbErr) { console.error('PIZZA DB Error:', dbErr.message); }
 
-    const waMessage = 'Pizza Ghar Order Pending\n\nItems: ' + summary + '\nTotal: Rs ' + total + '\nPhone: ' + phone + '\n\nPayment link:\nhttps://whatsapp.zappertrip.com/hackathon/pay?price=' + total + '&phone=' + encodeURIComponent(phone);
+    const waMessage = 'Pizza Ghar Order Pending\n\nOrder ID: #' + orderId + '\nItems: ' + summary + '\nTotal: Rs ' + total + '\nPhone: ' + phone + '\n\nPayment link:\nhttps://whatsapp.zappertrip.com/hackathon/pay?price=' + total + '&phone=' + encodeURIComponent(phone) + '&order_id=' + orderId;
 
     fetch(`${process.env.MAIN_APP_URL || 'http://127.0.0.1:3010'}${process.env.MAIN_APP_SEND_WA_PATH || '/api/ai-demo/send-wa'}`, {
       method: 'POST',
@@ -219,6 +219,48 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   }
 
   return res.status(500).json({ error: 'All transcription services failed' });
+});
+
+app.get('/api/owner/orders', async (req, res) => {
+  try {
+    const rows = await dbQuery("SELECT id, retailer_name, retailer_phone, total, order_note, status FROM catalog_orders WHERE store_id = 5 ORDER BY id DESC LIMIT 15", []);
+    res.json({ success: true, orders: rows });
+  } catch (err) {
+    console.error('Owner Dashboard Error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to fetch orders' });
+  }
+});
+
+app.post('/api/pay-confirm', async (req, res) => {
+  try {
+    const { phone, order_id } = req.body;
+    
+    if (order_id) {
+      console.log('💰 [PAY-CONFIRM HIT] Confirming specific Order ID:', order_id);
+      await dbQuery("UPDATE catalog_orders SET status = 'processing' WHERE id = ?", [order_id]);
+    } else if (phone) {
+      console.log('💰 [PAY-CONFIRM HIT] Confirming by phone:', phone);
+      await dbQuery("UPDATE catalog_orders SET status = 'processing' WHERE retailer_phone = ? AND status = 'pending' ORDER BY id DESC LIMIT 1", [phone]);
+    } else {
+      return res.status(400).json({ success: false, error: 'Order ID or Phone required' });
+    }
+    
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Pay Confirm Error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to confirm payment' });
+  }
+});
+
+app.delete('/api/owner/orders/:id', async (req, res) => {
+  try {
+    const orderId = req.params.id;
+    await dbQuery("DELETE FROM catalog_orders WHERE id = ?", [orderId]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete Order Error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to delete order' });
+  }
 });
 
 app.listen(process.env.PORT, () => {

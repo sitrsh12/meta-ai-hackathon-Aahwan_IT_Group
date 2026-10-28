@@ -14,7 +14,8 @@
 
     <div class="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 sm:p-8 text-center">
         <img src="pizzaghar-real.png" alt="Pizza Ghar" class="w-48 h-auto mx-auto mb-4 drop-shadow-md bg-white p-2 rounded-xl">
-                <p class="text-slate-500 text-sm mb-6">Secure Payment Gateway</p>
+                <p class="text-slate-500 text-sm mb-2">Secure Payment Gateway</p>
+                <p id="displayOrderId" class="text-red-600 font-bold font-mono text-sm mb-6"></p>
 
         <div class="bg-slate-50 rounded-xl p-4 mb-6 border border-slate-200 text-left text-sm">
             <div class="flex justify-between pt-1">
@@ -53,9 +54,11 @@
     <script>
         const params = new URLSearchParams(window.location.search);
         const price = params.get('price') || '0';
+        const orderId = params.get('order_id') || '';
         const phone = params.get('phone') || '';
 
         document.getElementById('orderPrice').innerText = 'Rs ' + price;
+        if(orderId) document.getElementById('displayOrderId').innerText = 'Order #' + orderId;
 
         let selectedMethod = 'eSewa';
 
@@ -81,8 +84,16 @@
             btn.innerHTML = '<span class="animate-spin text-xl">⏳</span> Processing...';
             btn.disabled = true;
 
-            // Simulate payment processing (frontend mock for demo)
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            try {
+                // Update order status in the database to 'confirmed'
+                await fetch('/hackathon/api/pay-confirm?v=5', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phone, order_id: orderId })
+                });
+            } catch (err) {
+                console.error('Failed to confirm payment', err);
+            }
 
             setTimeout(() => {
                 document.getElementById('paymentForm').style.display = 'none';
