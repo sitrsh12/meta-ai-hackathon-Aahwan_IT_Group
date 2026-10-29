@@ -46,6 +46,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 - **Brain:** Meta **Muse Spark 1.3** via Meta Model API - Extracts strict JSON, fuzzy matches to MySQL menu
 - **State:** Node.js Deterministic State Machine (The LLM only *extracts* JSON to support the flow, it **never executes or drives it**, completely preventing AI hallucinations and loops)
 - **Mouth:** Edge-TTS ne-NP-HemkalaNeural (Branded as **Hemlata** - Our Nepali Didi)
+- **Eyes (Multimodal):** Meta **muse-image-1.0** generates a combined professional food photograph of ALL ordered items, delivered asynchronously while Hemlata speaks.
 - **Agentic Upsell:** If a user orders a Pizza but no drink, the Node.js State Machine autonomously injects a prompt to add a Mango Lassi, acting as a revenue-generating salesperson.
 - **Delivery:** Baileys WhatsApp (receipt + payment link)
 - **Operations:** Live Owner Dashboard (auto-refreshes every 3s) + Payment Gateway Lifecycle (Pending -> Paid)
@@ -57,7 +58,8 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 - ai/metaAgent.js: Muse Spark 1.3 integration via api.meta.ai/v1
 - ai/pizzaAgent.js: Entity extraction + cart logic
 - server.js: Deterministic State Machine - LLM only extracts, never executes the flow (Zero Hallucinations)
-- public/pizza-voice.html: Nepali-localized UI + Dual-STT
+- public/pizza-voice.html: Nepali-localized UI + Dual-STT + Async image loading
+- ai/imageAgent.js: Meta muse-image-1.0 integration for combined cart visualization
 
 ### 🧠 Engineering Highlight: Dual-STT for Nepal
 We tested Meta Muse Voice Transcribe as primary. It does not officially support Nepali yet and hallucinated Bengali/Gujarati for accented Nepali.
@@ -74,7 +76,8 @@ This is honest engineering for a real-world client, not just a demo.
 3. Say "Ho, thapnus" -> Lassi is added to the cart
 4. Say "Pizza hataidinu" -> Removes correctly
 5. Confirm -> Order instantly pops up on the **Live Owner Dashboard** (Yellow PENDING)
-6. Click the WhatsApp payment link -> Complete mock eSewa/Khalti checkout
+6. **Image Magic:** AI generates a combined photo of the cart using Meta Muse Image while Hemlata speaks
+7. Click the WhatsApp payment link -> Complete mock eSewa/Khalti checkout
 7. Watch the Owner Dashboard instantly flip the order to **Green PAID** in real-time
 
 ### 🛠️ Tech Stack
