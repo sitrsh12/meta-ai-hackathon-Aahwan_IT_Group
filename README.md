@@ -41,7 +41,6 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 - **Business Model (SaaS):** We charge a subscription of **Rs 1,500/month** per shop (or 1% transaction fee). 
 - **Target Market:** There are **50,000+** registered restaurants and cafes in Nepal alone. If we capture just 1% of this market, it represents Rs 75 Lakhs in MRR.
 - **Why Meta AI?** Without Muse Spark's strict JSON extraction and Groq's fast Nepali transcription, this voice pipeline would be too slow and expensive to run on a profit margin at this scale.
-- **QR Optimization:** A static QR (permanent link) is used for hackathon judging — zero expiry, perfectly optimized for live testing.
 
 ### Architecture: Ears -> Brain -> State -> Mouth
 - **Ears (STT):** Groq whisper-large-v3 (Primary, <0.5s, ne) + Meta muse-voice-transcribe-1.0 (Fallback)
