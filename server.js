@@ -16,6 +16,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 const { executeDistributorQuery, handleCommerceQuery, callMetaLlama } = require('./ai/metaAgent');
 const { extractPizzaItems, matchPizzaMenu } = require('./ai/pizzaAgent');
+const { generateImage } = require('./ai/imageAgent');
 const mysql = require('mysql2/promise');
 const { execFile } = require('child_process');
 
@@ -56,6 +57,28 @@ app.post('/api/pizza-order', async (req, res) => {
     
     if (extracted.intent === 'ASK_MENU') {
       return res.json({ success: true, reply: 'हामी संग पिज्जा, बर्गर, पास्ता, र पेय पदार्थहरू छन्। तपाईं के अडर गर्न चाहनुहुन्छ। जस्तै: भेज फिस्ट पिज्जा वा मेंगो लस्सी', booking_confirmed: false, step: 'TAKING_ORDER' });
+    }
+
+    if (extracted.intent === 'ASK_IMAGE') {
+      const itemName = extracted.item_name || 'Pizza';
+      const imageUrl = await generateImage(itemName);
+      
+      if (imageUrl) {
+        return res.json({ 
+          success: true, 
+          reply: 'यहाँ तपाईंको ' + itemName + ' को तस्बिर छ।', 
+          image_url: imageUrl,
+          booking_confirmed: false, 
+          step: 'VIEWING_IMAGE' 
+        });
+      } else {
+        return res.json({ 
+          success: true, 
+          reply: 'माफ गर्नुहोस्, तस्बिर बनाउन सकिएन।', 
+          booking_confirmed: false, 
+          step: 'TAKING_ORDER' 
+        });
+      }
     }
 
     if (!extracted.items || extracted.items.length === 0) {
@@ -309,6 +332,24 @@ app.delete('/api/owner/orders/:id', async (req, res) => {
   } catch (err) {
     console.error('Delete Order Error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to delete order' });
+  }
+});
+
+app.post('/api/generate-cart-image', async (req, res) => {
+  try {
+    const { items } = req.body;
+    if (!items || items.length === 0) {
+      return res.status(400).json({ error: 'No items provided' });
+    }
+    console.log('🎨 [CART IMAGE] Generating combined image for:', items.join(', '));
+    const imageUrl = await generateImage(items);
+    if (imageUrl) {
+      return res.json({ success: true, image_url: imageUrl });
+    }
+    res.status(500).json({ error: 'Image generation failed' });
+  } catch (err) {
+    console.error('Cart Image Error:', err.message);
+    res.status(500).json({ error: err.message });
   }
 });
 

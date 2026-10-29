@@ -74,6 +74,11 @@ input.namebox { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-ra
 <div class="mic-container" id="micVisual">🎙️</div>
 <h2 id="status">बोल्न थिच्नुहोस्</h2>
 <p id="aiReply">पिज्जा घरमा स्वागत छ। के अर्डर गर्नुहुन्छ?</p>
+<img id="aiImage" style="display:none; width: 100%; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="AI Generated Image">
+<div id="imageLoader" style="display:none; text-align: center; color: #b91c1c; font-size: 14px; margin-bottom: 15px; font-weight: 600;">
+  <span style="display: inline-block; animation: spin 1s linear infinite; font-size: 18px;">🎨</span>
+  <span>तपाईंको अर्डरको तस्बिर बनाइँदैछ...</span>
+</div>
 <button onclick="startCall()" id="callBtn">🎙️ बोल्नुहोस्</button>
 <div id="textFallbackContainer" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
   <p style="font-size: 13px; color: #64748b; margin-bottom: 8px;">माइकले काम नगरे यहाँ टाइप गर्नुहोस्:</p>
@@ -110,6 +115,7 @@ function startDemo() {
   document.getElementById('callScreen').style.display = 'block';
 }
 function resetOrder() {
+  document.getElementById('aiImage').style.display = 'none';
   chatHistory = [];
   lastOrderText = '';
   pendingTotal = 0;
@@ -227,7 +233,7 @@ async function processBackend(userText, confirmed) {
     
     // Add a 15-second timeout to prevent infinite hanging
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000);
+    const timeoutId = setTimeout(() => controller.abort(), 45000);
     
     let res = await fetch('/hackathon/api/pizza-order', {
       method: 'POST',
@@ -240,11 +246,43 @@ async function processBackend(userText, confirmed) {
     
     let data = await res.json();
     chatHistory.push({ role: 'assistant', content: data.reply });
+
+    // Display generated image if present
+    const imgEl = document.getElementById('aiImage');
+    if (data.image_url) {
+      imgEl.src = data.image_url;
+      imgEl.style.display = 'block';
+    } else {
+      imgEl.style.display = 'none';
+    }
     
     if (!confirmed && data.step === 'CONFIRMING') {
       lastOrderText = userText;
       pendingTotal = data.total || 0;
       confirmBtn.style.display = 'block';
+      
+      // Fire-and-forget: generate combined cart image in background
+      if (data.cart && data.cart.length > 0) {
+        const itemNames = data.cart.map(function(m) { return m.found; });
+        document.getElementById('imageLoader').style.display = 'block';
+        document.getElementById('aiImage').style.display = 'none';
+        fetch('/hackathon/api/generate-cart-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items: itemNames })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(imgData) {
+          if (imgData.success && imgData.image_url) {
+            document.getElementById('imageLoader').style.display = 'none';
+            const imgEl = document.getElementById('aiImage');
+            imgEl.src = imgData.image_url;
+            imgEl.style.display = 'block';
+            console.log('🎨 Cart image loaded for:', itemNames.join(', '));
+          }
+        })
+        .catch(function(e) { console.error('Background cart image failed:', e); document.getElementById('imageLoader').style.display = 'none'; });
+      }
     } else if (data.booking_confirmed) {
       confirmBtn.style.display = 'none';
       callBtn.style.display = 'none';
@@ -289,6 +327,9 @@ let mediaRecorder;
 let audioChunks = [];
 
 function startCall() {
+  // Hide previous image when starting new recording
+  document.getElementById('aiImage').style.display = 'none';
+
   // Unlock speaker for iOS (Does NOT affect microphone)
   try {
     if (!window.audioCtx) {
