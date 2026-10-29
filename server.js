@@ -296,6 +296,22 @@ app.post('/api/pay-confirm', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Order ID or Phone required' });
     }
 
+    // 💊 DEDUCT STOCK FROM PRODUCTS
+    if (targetOrderId) {
+      try {
+        const stockRow = await dbQuery("SELECT order_note FROM catalog_orders WHERE id = ?", [targetOrderId]);
+        if (stockRow.length > 0 && stockRow[0].order_note) {
+          const items = JSON.parse(stockRow[0].order_note);
+          for (const item of items) {
+            if (item.id && item.qty) {
+              await dbQuery("UPDATE products SET stock_qty = GREATEST(0, stock_qty - ?) WHERE id = ?", [item.qty, item.id]);
+            }
+          }
+          console.log('📦 [STOCK DEDUCTED] Order #' + targetOrderId);
+        }
+      } catch (e) { console.error('Stock deduction failed:', e.message); }
+    }
+
     // Send the WhatsApp Receipt
     if (targetOrderId) {
       try {
@@ -332,6 +348,60 @@ app.delete('/api/owner/orders/:id', async (req, res) => {
   } catch (err) {
     console.error('Delete Order Error:', err.message);
     res.status(500).json({ success: false, error: 'Failed to delete order' });
+  }
+});
+
+app.get('/api/owner/inventory', async (req, res) => {
+  try {
+    const rows = await dbQuery("SELECT id, name, price_per_unit, stock_qty FROM products WHERE store_id = 5 AND active = 1 ORDER BY stock_qty ASC, name ASC", []);
+    res.json({ success: true, inventory: rows });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.put('/api/owner/inventory/:id', async (req, res) => {
+  try {
+    const { stock_qty } = req.body;
+    if (stock_qty === undefined || stock_qty === null || stock_qty < 0) {
+      return res.status(400).json({ success: false, error: 'Invalid stock quantity' });
+    }
+    await dbQuery("UPDATE products SET stock_qty = ? WHERE id = ? AND store_id = 5", [stock_qty, req.params.id]);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.get('/api/owner/stats', async (req, res) => {
+  try {
+    const rev = await dbQuery("SELECT COALESCE(SUM(total), 0) as revenue, COUNT(*) as orders FROM catalog_orders", []);
+    const low = await dbQuery("SELECT COUNT(*) as low_count FROM products WHERE store_id = 5 AND active = 1 AND stock_qty < 10", []);
+    res.json({
+      success: true,
+      total_revenue: rev[0].revenue,
+      total_orders: rev[0].orders,
+      low_stock_count: low[0].low_count
+    });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+app.post('/api/owner/ask', async (req, res) => {
+  try {
+    const { query } = req.body;
+    if (!query) return res.status(400).json({ error: 'No query provided' });
+
+    console.log('🤖 [OWNER ASK] Question:', query);
+    
+    const { executePizzaQuery } = require('./ai/metaAgent');
+    const answer = await executePizzaQuery(query);
+    
+    res.json({ success: true, answer: answer });
+  } catch (err) {
+    console.error('Owner Ask Error:', err.message);
+    res.status(500).json({ success: false, error: 'Failed to process query' });
   }
 });
 

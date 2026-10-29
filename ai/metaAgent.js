@@ -102,16 +102,64 @@ async function generateSQLForDistributor(userQuery) {
   return null;
 }
 
-async function executeDistributorQuery(userQuery) {
-  const sql = await generateSQLForDistributor(userQuery);
-  if (!sql || !sql.startsWith('SELECT')) return "I cannot answer that.";
+async function executePizzaQuery(userQuery) {
+  const systemPrompt = "You are an expert MySQL assistant for 'Pizza Ghar', a Nepali restaurant. Write a single SELECT query to answer the user's question.\n" +
+    "DATABASE SCHEMA:\n" +
+    "Table: catalog_orders (id, retailer_name, retailer_phone, total, status, order_note, created_at). status is 'pending' or 'processing'. created_at is a timestamp.\n" +
+    "Table: products (id, store_id, name, price_per_unit, stock_qty, active). active = 1 means available.\n" +
+    "CRITICAL RULES:\n" +
+    "- The products table contains items from MANY shops. Pizza Ghar is store_id = 5. ALWAYS filter products by store_id = 5.\n" +
+    "- Always add 'active = 1' when querying products.\n" +
+    "- catalog_orders.order_note is a JSON array of ordered items. Each element has: id, qty, found (item name), price, line_total.\n" +
+    "- 'How many ORDERS' = COUNT(*) on catalog_orders.\n" +
+    "- 'How many <ITEM> sold' = SUM of qty inside order_note JSON. NEVER use COUNT(*) for this. Use JSON_TABLE.\n" +
+    "- Only output the raw SQL query (no markdown, no backticks, no explanation).\n" +
+    "- Always start with SELECT.\n" +
+    "Examples:\n" +
+    "Q: How many orders total? -> SELECT COUNT(*) AS total_orders FROM catalog_orders;\n" +
+    "Q: What is total revenue? -> SELECT SUM(total) AS revenue FROM catalog_orders;\n" +
+    "Q: Which items are low on stock? -> SELECT name, stock_qty FROM products WHERE store_id = 5 AND active = 1 AND stock_qty < 10 ORDER BY stock_qty ASC;\n" +
+    "Q: How many pizzas sold today? -> SELECT COALESCE(SUM(j.qty), 0) AS pizzas_sold_today FROM catalog_orders o, JSON_TABLE(o.order_note, \'$[*]\' COLUMNS (qty INT PATH \'$.qty\', name VARCHAR(255) PATH \'$.found\')) AS j WHERE DATE(o.created_at) = CURDATE() AND j.name LIKE \'%Pizza%\';\n" +
+    "Q: How many burgers sold today? -> SELECT COALESCE(SUM(j.qty), 0) AS burgers_sold_today FROM catalog_orders o, JSON_TABLE(o.order_note, \'$[*]\' COLUMNS (qty INT PATH \'$.qty\', name VARCHAR(255) PATH \'$.found\')) AS j WHERE DATE(o.created_at) = CURDATE() AND j.name LIKE \'%Burger%\';\n" +
+    "Q: What is my best-selling item? -> SELECT j.name, SUM(j.qty) AS total_sold FROM catalog_orders o, JSON_TABLE(o.order_note, \'$[*]\' COLUMNS (qty INT PATH \'$.qty\', name VARCHAR(255) PATH \'$.found\')) AS j GROUP BY j.name ORDER BY total_sold DESC LIMIT 5;";
+  
   try {
-    const dbResult = await query(sql, []);
-    if (dbResult.length === 0) return "No records found.";
-    const formatPrompt = "User asked: " + userQuery + ". Data: " + JSON.stringify(dbResult) + ". Summarize in professional English.";
-    return await callMetaLlama(formatPrompt, "You are a data assistant.");
+    const rawResponse = await callMetaLlama(userQuery, systemPrompt, false);
+    const cleanSQL = rawResponse.replace(/```sql/gi, '').replace(/```/g, '').replace(/^SQL:\s*/i, '').trim();
+    
+    console.log('🤖 [AI CO-PILOT SQL]:', cleanSQL);
+    
+    if (!cleanSQL.toUpperCase().startsWith('SELECT')) {
+      return "I can only answer read-only questions about orders and inventory.";
+    }
+
+    // GUARDRAIL: Force store_id = 5 on any products query
+    let finalSQL = cleanSQL;
+    if (/\bfrom\s+products\b/i.test(finalSQL) && !/\bstore_id\s*=\s*5\b/i.test(finalSQL)) {
+      console.log('⚠️  [GUARDRAIL] Products query missing store_id = 5, auto-fixing...');
+      if (/\bwhere\b/i.test(finalSQL)) {
+        finalSQL = finalSQL.replace(/\bwhere\b/i, 'WHERE store_id = 5 AND');
+      } else if (/\border\s+by\b/i.test(finalSQL)) {
+        finalSQL = finalSQL.replace(/\border\s+by\b/i, 'WHERE store_id = 5 ORDER BY');
+      } else if (/\blimit\b/i.test(finalSQL)) {
+        finalSQL = finalSQL.replace(/\blimit\b/i, 'WHERE store_id = 5 LIMIT');
+      } else {
+        finalSQL = finalSQL.replace(/;?\s*$/, ' WHERE store_id = 5;');
+      }
+      console.log('🔧 [FIXED SQL]:', finalSQL);
+    }
+
+    const dbResult = await query(finalSQL, []);
+    
+    if (!dbResult || dbResult.length === 0) {
+      return "The query returned no data.";
+    }
+
+    const formatPrompt = "User asked: \"" + userQuery + "\". The database returned: " + JSON.stringify(dbResult) + ". Reply in a short, natural sentence (1-2 sentences max). IMPORTANT: This is a Nepali business - use 'Rs' for any currency/money amounts, NEVER use '$' or 'USD'. Do not mention SQL, tables, or database internals.";
+    return await callMetaLlama(formatPrompt, "You are a smart business assistant for Pizza Ghar. Be concise and helpful.");
   } catch (err) {
-    return "Error querying database.";
+    console.error('Pizza SQL Error:', err.message);
+    return "Sorry, I couldn't process that query. Try 'What are my total orders?' or 'Which items are low on stock?'";
   }
 }
 
@@ -134,4 +182,4 @@ async function handleCommerceQuery(userMessage, shopUid) {
   return await callMetaLlama(replyPrompt, "You are a shop assistant.", false);
 }
 
-module.exports = { executeDistributorQuery, handleCommerceQuery, callMetaLlama };
+module.exports = { executePizzaQuery, handleCommerceQuery, callMetaLlama };

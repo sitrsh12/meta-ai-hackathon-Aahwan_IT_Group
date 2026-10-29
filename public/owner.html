@@ -10,33 +10,305 @@
   @keyframes pulse-ring { 0% { transform: scale(0.8); opacity: 0.5; } 100% { transform: scale(1.5); opacity: 0; } }
   .pulse-dot { display: inline-block; width: 12px; height: 12px; background-color: #22c55e; border-radius: 50%; position: relative; margin-right: 8px; }
   .pulse-dot::before { content: ''; position: absolute; left: 0; top: 0; width: 100%; height: 100%; background-color: #22c55e; border-radius: 50%; animation: pulse-ring 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
+
+  .chip-btn {
+    background: rgba(99, 102, 241, 0.15);
+    color: #c7d2fe;
+    border: 1px solid rgba(99, 102, 241, 0.4);
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    font-family: 'Outfit', sans-serif;
+  }
+  .chip-btn:hover {
+    background: rgba(99, 102, 241, 0.3);
+    border-color: rgba(99, 102, 241, 0.7);
+    transform: translateY(-1px);
+  }
+  .chip-btn:active { transform: translateY(0); }
 </style>
 </head>
 <body class="p-8 min-h-screen">
   
-  <div class="max-w-6xl mx-auto">
-    <div class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
+  <div class="max-w-7xl mx-auto">
+    <header class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
       <div>
         <h1 class="text-3xl font-bold text-white tracking-tight">🍕 Pizza Ghar</h1>
-        <p class="text-slate-400 text-sm mt-1">Live Order Dashboard</p>
+        <p class="text-slate-400 text-sm mt-1">Hackathon Voice Agent Pilot (Live)</p>
       </div>
       <div class="flex items-center gap-6">
-        <a href="/hackathon/traction.html" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors">📈 View Business Metrics</a>
+        <a href="/hackathon/traction.html" class="text-sm font-semibold text-slate-400 hover:text-white transition-colors">📈 View Metrics</a>
         <div class="flex items-center bg-slate-800 px-4 py-2 rounded-full border border-slate-700">
           <span class="pulse-dot"></span>
           <span class="text-sm font-medium text-slate-300">Live Sync</span>
         </div>
       </div>
-    </div>
+    </header>
 
-    <div id="ordersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="col-span-full text-center text-slate-500 py-20 animate-pulse">
-        Waiting for incoming orders...
+    <!-- AI Copilot Chat Box -->
+    <div class="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 rounded-xl p-5 mb-8">
+      <div class="flex items-center gap-2 mb-3">
+        <span class="text-2xl">🤖</span>
+        <h2 class="text-lg font-bold text-white">Owner AI Copilot</h2>
+        <span class="text-xs text-indigo-300 bg-indigo-500/20 px-2 py-1 rounded">Muse Spark + Live DB</span>
+      </div>
+      <p class="text-slate-400 text-xs mb-3 uppercase tracking-wider font-semibold">Quick Questions</p>
+      <div class="flex flex-wrap gap-2 mb-4">
+        <button onclick="askCopilotChip('How many orders total?')" class="chip-btn">📊 Total Orders</button>
+        <button onclick="askCopilotChip('What is total revenue?')" class="chip-btn">💰 Total Revenue</button>
+        <button onclick="askCopilotChip('Which items are low on stock?')" class="chip-btn">⚠️ Low Stock Items</button>
+        <button onclick="askCopilotChip('How many pizzas sold today?')" class="chip-btn">🍕 Pizzas Sold Today</button>
+        <button onclick="askCopilotChip('What is my best-selling item?')" class="chip-btn">🏆 Best-Selling Item</button>
+      </div>
+      <div class="flex gap-2">
+        <input type="text" id="copilotInput" placeholder="e.g. What was my revenue today?" class="flex-1 bg-slate-900 text-white px-4 py-3 rounded-lg border border-slate-600 focus:border-indigo-500 outline-none" onkeypress="if(event.key==='Enter') askCopilot()" />
+        <button onclick="askCopilot()" id="copilotBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-6 py-3 rounded-lg transition">Ask</button>
+      </div>
+      <div id="copilotAnswer" class="hidden mt-4 bg-slate-900/80 rounded-lg p-4 border border-indigo-500/30">
+        <div class="text-xs text-indigo-400 font-bold uppercase mb-1">Answer</div>
+        <div id="copilotText" class="text-white font-medium"></div>
       </div>
     </div>
+
+    <!-- KPI Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Pilot Revenue</div>
+        <div class="text-3xl font-bold text-emerald-400 mt-2" id="kpiRevenue">—</div>
+      </div>
+      <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Pilot Orders</div>
+        <div class="text-3xl font-bold text-blue-400 mt-2" id="kpiOrders">—</div>
+      </div>
+      <div class="bg-gradient-to-br from-slate-800 to-slate-900 rounded-xl p-5 border border-slate-700 cursor-pointer hover:border-red-500 transition" onclick="switchTab('inventory')">
+        <div class="text-xs text-slate-400 uppercase tracking-wider font-semibold">Low Stock Items</div>
+        <div class="text-3xl font-bold text-red-400 mt-2" id="kpiLowStock">—</div>
+        <div class="text-xs text-red-400 mt-1">Click to manage →</div>
+      </div>
+    </div>
+
+    <!-- Tab Bar -->
+    <div class="flex gap-2 border-b border-slate-700 mb-6">
+      <button onclick="switchTab('orders')" id="tabBtn-orders" class="px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors bg-slate-700 text-white">
+        🛒 Live Orders
+      </button>
+      <button onclick="switchTab('inventory')" id="tabBtn-inventory" class="px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors text-slate-400 hover:text-white">
+        📦 Inventory
+      </button>
+    </div>
+
+    <!-- Live Orders Tab -->
+    <div id="tabContent-orders">
+      <div id="ordersGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="col-span-full text-center text-slate-500 py-20 animate-pulse">
+          Waiting for incoming orders...
+        </div>
+      </div>
+    </div>
+
+    <!-- Inventory Tab -->
+    <div id="tabContent-inventory" class="hidden">
+      <div class="flex flex-wrap gap-3 mb-6">
+        <input 
+          type="text" 
+          id="inventorySearch" 
+          placeholder="🔍 Search products..." 
+          oninput="renderInventory()" 
+          class="flex-1 min-w-64 bg-slate-800 text-white px-4 py-3 rounded-lg border border-slate-700 focus:border-red-500 outline-none"
+        />
+        <button onclick="toggleLowStockFilter()" id="lowStockFilterBtn" class="px-5 py-3 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 border border-slate-700 hover:border-red-500 transition">
+          ⚠️ Low Stock Only
+        </button>
+      </div>
+      <div id="inventoryGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" style="max-height: 700px; overflow-y: auto; padding-right: 8px;">
+        <div class="col-span-full text-center text-slate-500 py-10">Loading inventory...</div>
+      </div>
+    </div>
+
   </div>
 
 <script>
+// ====== AI COPILOT ======
+function askCopilotChip(question) {
+  const input = document.getElementById('copilotInput');
+  input.value = question;
+  askCopilot();
+}
+
+async function askCopilot() {
+  const input = document.getElementById('copilotInput');
+  const query = input.value.trim();
+  if (!query) return;
+
+  const btn = document.getElementById('copilotBtn');
+  const ansBox = document.getElementById('copilotAnswer');
+  const ansText = document.getElementById('copilotText');
+  
+  btn.disabled = true;
+  btn.innerText = 'Thinking...';
+  ansBox.classList.remove('hidden');
+  ansText.innerText = 'Muse Spark is analyzing your database...';
+
+  try {
+    const res = await fetch('/hackathon/api/owner/ask', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ query: query })
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      ansText.innerText = data.answer;
+    } else {
+      ansText.innerText = 'Error: ' + (data.error || 'Could not answer.');
+    }
+  } catch (err) {
+    ansText.innerText = 'Network error. Please try again.';
+  } finally {
+    btn.disabled = false;
+    btn.innerText = 'Ask';
+    input.value = '';
+  }
+}
+
+// ====== TAB SWITCHING ======
+function switchTab(name) {
+  const orders = document.getElementById('tabContent-orders');
+  const inventory = document.getElementById('tabContent-inventory');
+  const btnOrders = document.getElementById('tabBtn-orders');
+  const btnInventory = document.getElementById('tabBtn-inventory');
+  const activeClass = 'px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors bg-slate-700 text-white';
+  const inactiveClass = 'px-6 py-3 font-semibold text-sm rounded-t-lg transition-colors text-slate-400 hover:text-white';
+  if (name === 'orders') {
+    orders.classList.remove('hidden');
+    inventory.classList.add('hidden');
+    btnOrders.className = activeClass;
+    btnInventory.className = inactiveClass;
+  } else {
+    orders.classList.add('hidden');
+    inventory.classList.remove('hidden');
+    btnOrders.className = inactiveClass;
+    btnInventory.className = activeClass;
+  }
+}
+
+// ====== STATS ======
+async function fetchStats() {
+  try {
+    const res = await fetch('/hackathon/api/owner/stats?v=' + Date.now(), { cache: 'no-store' });
+    const data = await res.json();
+    if (!data.success) return;
+    document.getElementById('kpiRevenue').innerText = 'Rs ' + Number(data.total_revenue || 0).toLocaleString();
+    document.getElementById('kpiOrders').innerText = data.total_orders || 0;
+    document.getElementById('kpiLowStock').innerText = data.low_stock_count || 0;
+  } catch(e) { console.error('Stats fetch failed', e); }
+}
+
+// ====== INVENTORY MANAGEMENT ======
+let _inventoryCache = [];
+let _lowStockOnly = false;
+
+async function fetchInventory() {
+  try {
+    const res = await fetch('/hackathon/api/owner/inventory?v=' + Date.now(), { cache: 'no-store' });
+    const data = await res.json();
+    if (!data.success || !data.inventory) return;
+    _inventoryCache = data.inventory;
+    renderInventory();
+  } catch (err) {
+    console.error('Inventory fetch failed', err);
+  }
+}
+
+function toggleLowStockFilter() {
+  _lowStockOnly = !_lowStockOnly;
+  const btn = document.getElementById('lowStockFilterBtn');
+  if (_lowStockOnly) {
+    btn.className = 'px-5 py-3 rounded-lg font-semibold text-sm bg-red-600 text-white border border-red-500';
+  } else {
+    btn.className = 'px-5 py-3 rounded-lg font-semibold text-sm bg-slate-800 text-slate-300 border border-slate-700 hover:border-red-500 transition';
+  }
+  renderInventory();
+}
+
+function renderInventory() {
+  const grid = document.getElementById('inventoryGrid');
+  const searchEl = document.getElementById('inventorySearch');
+  const query = (searchEl ? searchEl.value : '').toLowerCase();
+  
+  let filtered = _inventoryCache.filter(item => {
+    if (query && !item.name.toLowerCase().includes(query)) return false;
+    if (_lowStockOnly && parseFloat(item.stock_qty) >= 5) return false;
+    return true;
+  });
+  
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="col-span-full text-center text-slate-500 py-10">No products match your filter.</div>';
+    return;
+  }
+  
+  let html = '';
+  filtered.forEach(item => {
+    const stock = parseFloat(item.stock_qty);
+    const isLow = stock < 10;
+    const isMedium = stock >= 10 && stock < 30;
+    let stockColor = 'text-green-400';
+    if (isLow) stockColor = 'text-red-400';
+    else if (isMedium) stockColor = 'text-yellow-400';
+    
+    html += `
+      <div class="bg-slate-800 rounded-xl p-4 border border-slate-700">
+        <div class="flex justify-between items-start mb-3">
+          <div class="flex-1 pr-2">
+            <div class="font-semibold text-white text-sm leading-tight">${item.name}</div>
+            <div class="text-xs text-slate-400 mt-1">Rs ${item.price_per_unit}</div>
+          </div>
+          <div class="text-right">
+            <div class="text-xs text-slate-400">Stock</div>
+            <div class="text-2xl font-bold ${stockColor}">${stock}</div>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <input type="number" min="0" value="${stock}" id="stock-input-${item.id}" class="flex-1 bg-slate-900 text-white text-sm px-3 py-2 rounded-lg border border-slate-600 focus:border-red-500 outline-none" />
+          <button onclick="updateStock(${item.id})" class="bg-slate-700 hover:bg-slate-600 text-white text-sm px-4 py-2 rounded-lg font-semibold transition">Save</button>
+        </div>
+      </div>
+    `;
+  });
+  grid.innerHTML = html;
+}
+
+async function updateStock(id) {
+  const input = document.getElementById('stock-input-' + id);
+  const qty = parseFloat(input.value);
+  if (isNaN(qty) || qty < 0) { alert('Invalid stock value'); return; }
+  
+  try {
+    const res = await fetch('/hackathon/api/owner/inventory/' + id, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ stock_qty: qty })
+    });
+    if (res.ok) {
+      fetchInventory();
+      fetchStats();
+    } else {
+      alert('Failed to update stock');
+    }
+  } catch (err) {
+    alert('Network error');
+  }
+}
+
+// Initial load + auto-refresh
+fetchStats();
+fetchInventory();
+setInterval(fetchStats, 5000);
+setInterval(fetchInventory, 5000);
+
 async function deleteOrder(id) {
   if (!confirm('Are you sure you want to delete Order #' + id + '?')) return;
   try {

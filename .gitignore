@@ -27,3 +27,7 @@ uploads/
 coverage/
 dist/
 build/
+
+# Backups
+*.bak
+*.backup
