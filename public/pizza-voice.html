@@ -6,26 +6,154 @@
 <title>पिज्जा घर - नेपाली भ्वाइस अर्डर</title>
 <script src="phone-input.js"></script>
 <style>
-body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #b91c1c 0%, #431407 100%); color: white; text-align: center; padding: 20px; min-height: 100vh; margin: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #3f0d0d;
+  color: white;
+  text-align: center;
+  padding: 20px;
+  min-height: 100vh;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Top-right circle (dot cluster + Nepal flag) */
+.corner-tr {
+  position: fixed;
+  top: -25px;
+  right: -25px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(251, 191, 36, 0.75);
+  background-color: #c01818;
+  background-image:
+    url("/hackathon/nepal-flag.svg"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='1.5' fill='%23fbbf24'/%3E%3C/svg%3E");
+  background-size: 35px auto, 8px 8px;
+  background-position: center, 0 0;
+  background-repeat: no-repeat, repeat;
+  box-shadow: 
+    0 0 0 1px rgba(251, 191, 36, 0.15),
+    0 0 24px rgba(251, 191, 36, 0.35),
+    0 0 60px rgba(251, 191, 36, 0.15),
+    inset 0 0 20px rgba(251, 191, 36, 0.08);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Top-left 1/8th arc (decorative) */
+.arc-tl {
+  position: fixed;
+  top: -120px;
+  left: -120px;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 60% 60%, #d42020 0%, #a01818 100%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Bottom-left circle (dot cluster + Nepal flag) */
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -25px;
+  left: -25px;
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(251, 191, 36, 0.75);
+  background-color: #c01818;
+  background-image:
+    url("/hackathon/nepal-flag.svg"),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10'%3E%3Ccircle cx='5' cy='5' r='1.5' fill='%23fbbf24'/%3E%3C/svg%3E");
+  background-size: 35px auto, 8px 8px;
+  background-position: center, 0 0;
+  background-repeat: no-repeat, repeat;
+  box-shadow: 
+    0 0 0 1px rgba(251, 191, 36, 0.15),
+    0 0 24px rgba(251, 191, 36, 0.35),
+    0 0 60px rgba(251, 191, 36, 0.15),
+    inset 0 0 20px rgba(251, 191, 36, 0.08);
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Bottom-right circle (dot cluster + Nepal flag) */
+.brand-logo, p.subtitle, .box {
+  position: relative;
+  z-index: 1;
+}
+
 h1 { margin-bottom: 8px; font-weight: 800; font-size: 26px; }
-p.subtitle { color: #fed7aa; margin-top: 0; margin-bottom: 30px; font-size: 16px; }
-.box { background: white; color: #1e293b; padding: 35px 25px; border-radius: 24px; max-width: 380px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.3); box-sizing: border-box; }
-.mic-container { 
-  width: 90px; height: 90px; background: #f8fafc; border-radius: 50%; margin: 0 auto 24px; 
-  display: flex; align-items: center; justify-content: center; font-size: 36px; 
-  position: relative; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.05); 
+
+p.subtitle {
+  color: #fbbf24;
+  margin-top: 0;
+  margin-bottom: 24px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.2);
 }
-.mic-container.listening { 
-  background: #fef2f2; box-shadow: 0 0 0 15px rgba(239,68,68,0.15); 
-  animation: pulse-ring 1.5s infinite; 
+
+.box {
+  background: white;
+  color: #1e293b;
+  padding: 32px 28px;
+  border-radius: 24px;
+  max-width: 380px;
+  width: 100%;
+  box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 4px rgba(251, 191, 36, 0.2);
+  box-sizing: border-box;
 }
-.mic-container.processing { 
-  background: #f8fafc; border: 4px solid #e2e8f0; border-top-color: #b91c1c; 
-  animation: spin 1s linear infinite; 
+
+.box h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #0f172a;
 }
-.mic-container.speaking { 
-  background: #fff7ed; box-shadow: 0 0 0 15px rgba(234,88,12,0.15); 
-  animation: pulse-speak 2s infinite; 
+
+.box p {
+  color: #475569;
+  font-size: 15px;
+  text-align: left;
+  line-height: 1.5;
+  margin-top: 0;
+  margin-bottom: 20px;
+}
+
+.mic-container {
+  width: 90px; height: 90px; background: #f8fafc; border-radius: 50%; margin: 0 auto 24px;
+  display: flex; align-items: center; justify-content: center; font-size: 36px;
+  position: relative; transition: all 0.3s ease; box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+.mic-container.listening {
+  background: #fef2f2; box-shadow: 0 0 0 15px rgba(239,68,68,0.15);
+  animation: pulse-ring 1.5s infinite;
+}
+.mic-container.processing {
+  background: #f8fafc; border: 4px solid #e2e8f0; border-top-color: #b91c1c;
+  animation: spin 1s linear infinite;
+}
+.mic-container.speaking {
+  background: #fff7ed; box-shadow: 0 0 0 15px rgba(234,88,12,0.15);
+  animation: pulse-speak 2s infinite;
 }
 @keyframes pulse-ring {
   0% { box-shadow: 0 0 0 0 rgba(185,28,28,0.4); }
@@ -41,53 +169,154 @@ p.subtitle { color: #fed7aa; margin-top: 0; margin-bottom: 30px; font-size: 16px
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
-#status { font-weight: 600; font-size: 16px; margin-bottom: 12px; min-height: 20px; color: #b91c1c; }
-#aiReply { color: #64748b; font-style: italic; min-height: 40px; line-height: 1.5; margin-bottom: 20px; font-size: 15px; }
-button { background: #b91c1c; color: white; padding: 16px 32px; border: none; border-radius: 50px; font-size: 17px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 15px; }
-button:disabled { background: #94a3b8; cursor: not-allowed; }
-.confirm-btn { background: #16a34a; display: none; }
-.reset-btn { background: #2563eb; display: none; }
-input.namebox { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; margin-top: 12px; box-sizing: border-box; }
 
-  .brand-logo {
-    width: 140px;
-    height: auto;
-    margin-bottom: 10px;
-    filter: drop-shadow(0px 8px 16px rgba(0,0,0,0.4));
+#status { font-weight: 700; font-size: 18px; margin-bottom: 12px; min-height: 20px; color: #b91c1c; letter-spacing: -0.3px; }
+#aiReply { color: #475569; font-style: normal; font-weight: 500; min-height: 40px; line-height: 1.5; margin-bottom: 20px; font-size: 15px; text-align: left; padding: 0 4px; }
+
+button {
+  background: linear-gradient(135deg, #dc2626 0%, #991b1b 100%);
+  color: white;
+  padding: 16px 32px;
+  border: none;
+  border-radius: 50px;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: 'Outfit', sans-serif;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 15px;
+  box-shadow: 0 8px 20px rgba(220,38,38,0.35), inset 0 1px 0 rgba(255,255,255,0.15);
+  transition: all 0.2s ease;
+}
+button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 24px rgba(220,38,38,0.45), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+button:active:not(:disabled) { transform: translateY(0); }
+button:disabled { background: #94a3b8; box-shadow: none; cursor: not-allowed; }
+
+.confirm-btn { background: linear-gradient(135deg, #10b981 0%, #059669 100%); box-shadow: 0 8px 20px rgba(16,185,129,0.35), inset 0 1px 0 rgba(255,255,255,0.15); display: none; }
+.reset-btn { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); box-shadow: 0 8px 20px rgba(59,130,246,0.35), inset 0 1px 0 rgba(255,255,255,0.15); display: none; }
+
+input.namebox, #manualTextInput {
+  width: 100%; padding: 13px 16px; border: 1.5px solid #e2e8f0; border-radius: 14px;
+  margin-top: 12px; box-sizing: border-box; font-family: 'Outfit', sans-serif;
+  font-size: 15px; background: #f8fafc; transition: all 0.2s ease;
+}
+input.namebox:focus, #manualTextInput:focus {
+  outline: none; border-color: #dc2626; background: #fff;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1);
+}
+
+.brand-logo {
+  width: 180px; height: auto; margin-bottom: 12px; background: white;
+  padding: 8px; border-radius: 50px; border: 4px solid #fbbf24;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.3), 0 0 20px rgba(251, 191, 36, 0.4);
+}
+
+.trust-badge {
+  font-size: 12px; color: #94a3b8; text-align: center; margin-top: 16px;
+  font-weight: 500; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+
+.ghost-btn {
+  background: #fef2f2 !important; color: #b91c1c !important;
+  border: 1.5px solid #fca5a5 !important; box-shadow: none !important; font-weight: 600 !important;
+}
+.ghost-btn:hover:not(:disabled) {
+  background: #fee2e2 !important; border-color: #ef4444 !important;
+  box-shadow: none !important; transform: none !important;
+}
+.ghost-btn.ghost-slate {
+  background: #f8fafc !important; color: #475569 !important; border-color: #cbd5e1 !important;
+}
+.ghost-btn.ghost-slate:hover:not(:disabled) {
+  background: #f1f5f9 !important; border-color: #94a3b8 !important;
+}
+.ghost-btn.ghost-menu {
+  color: #2563eb !important; border-color: #93c5fd !important;
+}
+.ghost-btn.ghost-menu:hover:not(:disabled) {
+  background: #eff6ff !important; border-color: #3b82f6 !important;
+}
+
+#phoneInputHost > div {
+  border: 1.5px solid #e2e8f0 !important; border-radius: 14px !important;
+  background: #f8fafc !important; margin-top: 12px !important;
+  transition: all 0.2s ease !important; box-shadow: none !important;
+}
+#phoneInputHost > div:focus-within {
+  border-color: #dc2626 !important; background: #fff !important;
+  box-shadow: 0 0 0 3px rgba(220,38,38,0.1) !important;
+}
+#phoneInputHost select {
+  background: transparent !important; border-right: 1px solid #e2e8f0 !important;
+  font-family: 'Outfit', sans-serif !important; color: #334155 !important;
+  font-size: 15px !important; font-weight: 600 !important;
+}
+#phoneInputHost input {
+  border: none !important; outline: none !important; background: transparent !important;
+  margin: 0 !important; padding: 13px 16px !important;
+  font-family: 'Outfit', sans-serif !important; font-size: 15px !important;
+  color: #0f172a !important; font-weight: 500 !important;
+}
+#phoneInputHost input::placeholder { color: #94a3b8 !important; font-weight: 400 !important; }
+
+@media (min-width: 768px) {
+  body::after, .corner-tr {
+    width: 180px; height: 180px; background-size: 45px auto, 10px 10px;
+    border: 2px solid rgba(251, 191, 36, 0.75);
+    box-shadow:
+      0 0 0 1px rgba(251, 191, 36, 0.15),
+      0 0 30px rgba(251, 191, 36, 0.4),
+      0 0 80px rgba(251, 191, 36, 0.2),
+      inset 0 0 24px rgba(251, 191, 36, 0.1);
   }
+  body::after { bottom: -30px; left: -30px; }
+  .corner-tr { top: -30px; right: -30px; }
+  .arc-tl {
+    width: 420px;
+    height: 420px;
+    top: -160px;
+    left: -160px;
+  }
+}
 </style>
 </head>
 <body>
-<img src="pizzaghar-real.png" alt="Pizza Ghar" class="brand-logo" style="background: white; padding: 10px; border-radius: 16px; width: 180px;">
+<div class="arc-tl"></div>
+<div class="corner-tr"></div>
+<img src="pizzaghar-real.png" alt="Pizza Ghar" class="brand-logo">
 <p class="subtitle">नेपाली भ्वाइस एआई अर्डर - Muse Spark 1.3</p>
 <div class="box" id="phoneScreen">
-<h2 style="margin-top:0;">नमस्ते!</h2>
-<p style="color:#64748b;font-size:14px;">WhatsApp नम्बर हाल्नुहोस्, अर्डरको पेमेन्ट लिंक त्यहीँ आउँछ।</p>
+<h2>👋 नमस्ते!</h2>
+<p>WhatsApp नम्बर हाल्नुहोस्, अर्डरको पेमेन्ट लिंक त्यहीँ आउँछ।</p>
 <div style="text-align:left;">
 <label style="font-size:12px;font-weight:700;color:#475569;">WhatsApp नम्बर</label>
 <div id="phoneInputHost"></div>
 <input id="judgeName" class="namebox" placeholder="तपाईंको नाम">
 </div>
 <button onclick="startDemo()">अर्डर गर्न यहाँ थिच्नुहोस्</button>
+<div class="trust-badge">🔒 Powered by Meta Muse Spark 1.3</div>
 </div>
 <div class="box" id="callScreen" style="display:none;">
 <div class="mic-container" id="micVisual">🎙️</div>
 <h2 id="status">बोल्न थिच्नुहोस्</h2>
 <p id="aiReply">पिज्जा घरमा स्वागत छ। के अर्डर गर्नुहुन्छ?</p>
-<img id="aiImage" style="display:none; width: 100%; border-radius: 16px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" alt="AI Generated Image">
+<img id="aiImage" style="display:none; width: 100%; border-radius: 20px; margin-bottom: 20px; border: 5px solid #fbbf24; box-shadow: 0 12px 32px rgba(251,191,36,0.3); object-fit: cover;" alt="AI Generated Image">
 <div id="imageLoader" style="display:none; text-align: center; color: #b91c1c; font-size: 14px; margin-bottom: 15px; font-weight: 600;">
   <span style="display: inline-block; animation: spin 1s linear infinite; font-size: 18px;">🎨</span>
   <span>तपाईंको अर्डरको तस्बिर बनाइँदैछ...</span>
 </div>
+<button onclick="confirmOrder()" id="confirmBtn" class="confirm-btn">✅ अर्डर कन्फर्म गर्नुहोस्</button>
 <button onclick="startCall()" id="callBtn">🎙️ बोल्नुहोस्</button>
-<div id="textFallbackContainer" style="margin-top: 20px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
+<div id="textFallbackContainer" style="margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 15px;">
   <p style="font-size: 13px; color: #64748b; margin-bottom: 8px;">माइकले काम नगरे यहाँ टाइप गर्नुहोस्:</p>
   <input type="text" id="manualTextInput" placeholder="जस्तै: Euta Veggie Pizza" style="width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 12px; margin-bottom: 10px; box-sizing: border-box; font-size: 14px;">
-  <button onclick="submitManualText()" style="background: #0f172a; margin-top: 0; font-size: 14px; padding: 12px;">पठाउनुहोस् (Send)</button>
+  <button onclick="submitManualText()" class="ghost-btn ghost-slate" style="margin-top: 0; font-size: 14px; padding: 12px;">पठाउनुहोस् (Send)</button>
 </div>
-<button onclick="confirmOrder()" id="confirmBtn" class="confirm-btn">✅ अर्डर कन्फर्म गर्नुहोस्</button>
 <button onclick="resetOrder()" id="resetBtn" class="reset-btn">🔄 नयाँ अर्डर</button>
-<button onclick="window.open('https://whatsapp.zappertrip.com/store/5', '_blank')" style="background:#2563eb; margin-top:10px; font-size:15px; padding:14px; font-weight:bold; border-radius:50px; color:white; border:none; width:100%; cursor:pointer;">📖 मेनु हेर्नुहोस्</button>
+<button onclick="window.open('https://whatsapp.zappertrip.com/store/5', '_blank')" class="ghost-btn ghost-menu" style="margin-top:10px; font-size:15px; padding:14px;">📖 मेनु हेर्नुहोस्</button>
 </div>
 <script>
 let judgePhone = '';
@@ -122,6 +351,7 @@ function resetOrder() {
   confirmBtn.style.display = 'none';
   resetBtn.style.display = 'none';
   callBtn.style.display = 'block';
+  callBtn.classList.remove('ghost-btn');
   micVisual.style.display = 'flex';
   aiReplyEl.innerText = 'पिज्जा घरमा स्वागत छ। के अर्डर गर्नुहुन्छ?';
   statusEl.innerText = 'बोल्न थिच्नुहोस्';
@@ -260,6 +490,7 @@ async function processBackend(userText, confirmed) {
       lastOrderText = userText;
       pendingTotal = data.total || 0;
       confirmBtn.style.display = 'block';
+      callBtn.classList.add('ghost-btn');
       
       // Fire-and-forget: generate combined cart image in background
       if (data.cart && data.cart.length > 0) {
@@ -293,6 +524,7 @@ async function processBackend(userText, confirmed) {
       // DO NOT clear lastOrderText here. If the AI fails to hear an addition, 
       // we don't want to delete the user's entire cart.
       confirmBtn.style.display = 'none';
+      callBtn.classList.remove('ghost-btn');
     }
     
     speak(data.reply);
