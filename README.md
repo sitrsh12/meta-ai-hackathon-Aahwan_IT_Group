@@ -46,7 +46,7 @@ Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic. Generic b
 PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perfect order.
 
 ### 💼 Business Impact & Scale
-- **Current Traction:** **Aahwan IT Group** (founded 2017) has been building software for businesses in Nepal. In Feb 2026, we launched **Aahwan Loyalty**, which now powers **5 shops** in Jhapa, serving **116 active customers** and **21,000+ points** (verified MySQL production data).
+- **Current Traction:** We are **Aahwan IT Group Pvt Ltd** (founded 2017), a software company based in Nepal. Our flagship product is **[Zappertrip](https://zappertrip.com)**, a WhatsApp automation platform launched in Feb 2026, which powers **5 shops** in Jhapa, serving **116 active customers** and **21,000+ loyalty points** (verified production MySQL data).
 - **Hackathon Innovation:** The Voice Ordering Agent is built *on top* of Aahwan Loyalty, currently piloted with **PizzaGhar (Birtamode)** as the flagship client. The other 4 pilot shops will receive the voice agent next.
 - **Business Model (SaaS):** We charge a subscription of **Rs 1,500/month** per shop (or 1% transaction fee). 
 - **Target Market:** There are **50,000+** registered restaurants and cafes in Nepal alone. If we capture just 1% of this market, it represents Rs 75 Lakhs in MRR.
