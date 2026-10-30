@@ -8,7 +8,7 @@
 **Startup Track | Build for Your World**
 > Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
 
-**Live:** https://whatsapp.zappertrip.com/hackathon/pizza-voice
+**Live:** https://whatsapp.zappertrip.com/hackathon/
 **Demo Video:** Coming soon.
 
 <div align="left">
@@ -20,6 +20,7 @@
 
 ### 🌐 Live Demos (Judge Click Here)
 
+- 🚀 **Landing Page (Start Here):** [/](https://whatsapp.zappertrip.com/hackathon/)
 - 🎤 **Customer Voice Agent:** [/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
 - 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
 - 📈 **Traction Dashboard (116 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
@@ -65,6 +66,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 - ai/metaAgent.js: `executePizzaQuery` — Agentic Text-to-SQL for the Owner Copilot (JSON_TABLE parsing, store_id enforcement, SELECT-only guardrails)
 - server.js: Inventory system — `/api/owner/ask`, `/api/owner/inventory`, `/api/owner/stats` + automatic stock deduction on payment
 - public/owner.html: Pro dashboard — KPI cards (Revenue/Orders/Low Stock), tabbed interface, searchable inventory, AI Copilot with clickable query chips
+- public/index.html: Premium landing page — Hero section, clickable product screenshots, tech stack breakdown, and dual-persona architecture visualization.
 
 ### 🧠 Engineering Highlight: Dual-STT for Nepal
 We tested Meta Muse Voice Transcribe as primary. It does not officially support Nepali yet and hallucinated Bengali/Gujarati for accented Nepali.
