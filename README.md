@@ -8,7 +8,6 @@
 **Startup Track | Build for Your World**
 > Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
 
-**Live:** https://whatsapp.zappertrip.com/hackathon/
 **Built by:** [Sitesh Adhikari](https://www.linkedin.com/in/sitesh-adhikari/) — Founder, Aahwan IT Group Pvt Ltd
 
 **Live App:** https://whatsapp.zappertrip.com/hackathon/
@@ -26,13 +25,6 @@
     <img src="https://raw.githubusercontent.com/sitrsh12/meta-ai-hackathon-Aahwan_IT_Group/main/public/qr.png" alt="Scan to try the Voice Agent" width="100" style="border-radius: 8px; border: 1px solid #444;" />
   </a>
   <p><em>📱 Scan the QR code or click the screenshots above to experience the live app.</em></p>
-</div>
-
-<div align="left">
-  <a href="https://whatsapp.zappertrip.com/hackathon/pizza-voice.html">
-    <img src="https://raw.githubusercontent.com/sitrsh12/meta-ai-hackathon-Aahwan_IT_Group/main/public/qr.png" alt="Scan to try the Voice Agent" width="150" style="border-radius: 12px; border: 2px solid #eee;" />
-  </a>
-  <p><em>📱 Scan with your phone to try the live Voice Agent instantly.</em></p>
 </div>
 
 ### 🌐 Live Demos (Judge Click Here)
