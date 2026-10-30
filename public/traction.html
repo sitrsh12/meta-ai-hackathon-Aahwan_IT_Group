@@ -78,10 +78,12 @@
     font-size: 20px;
     font-weight: 600;
     color: var(--text-primary);
+    white-space: nowrap;
   }
   .brand-text small {
     color: var(--text-muted);
     font-size: 13px;
+    white-space: nowrap;
   }
 
   .logo-btn {
@@ -127,6 +129,9 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
   }
   
   /* Subtle top highlight line */
@@ -247,6 +252,83 @@
     line-height: 1;
     margin-left: 4px;
   }
+  /* ── Site Footer ───────────────────────────────────── */
+  .site-footer {
+    margin-top: 80px;
+    border-top: 1px solid var(--border-subtle);
+    padding: 40px 24px;
+    background: var(--bg-base);
+    position: relative;
+    z-index: 10;
+  }
+  .site-footer-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    align-items: center;
+    text-align: center;
+  }
+  @media (min-width: 768px) {
+    .site-footer-inner {
+      flex-direction: row;
+      justify-content: space-between;
+      text-align: left;
+      gap: 16px;
+    }
+  }
+  .site-footer-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .site-footer-brand img {
+    height: 32px;
+    width: auto;
+    background: white;
+    border-radius: 4px;
+    padding: 4px;
+  }
+  .site-footer-brand-name {
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--text-primary);
+    line-height: 1;
+  }
+  .site-footer-brand-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+  .site-footer-links {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px 20px;
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .site-footer-links a {
+    color: var(--text-secondary);
+    text-decoration: none;
+    white-space: nowrap;
+    transition: color 0.15s ease;
+  }
+  .site-footer-links a:hover {
+    color: var(--accent-green);
+  }
+  .site-footer-copy {
+    font-size: 11px;
+    color: var(--text-muted);
+    text-align: center;
+    line-height: 1.6;
+  }
+  @media (min-width: 768px) {
+    .site-footer-copy {
+      text-align: right;
+    }
+  }
 </style>
 </head>
 <body>
@@ -258,12 +340,12 @@
       <h1>TRACTION — <span id="shop-count">…</span> Shops LIVE</h1>
       <p class="subline">
         <span class="dot"></span>
-        Aahwan Loyalty · Customer Loyalty Platform · Jhapa, Nepal · Live since Feb 2026 · Live since Sept 2024 <span class="nepal-flag">🇳🇵</span>
+        Aahwan Loyalty · Customer Loyalty Platform · Jhapa, Nepal · Live since Feb 2026 <span class="nepal-flag">🇳🇵</span>
       </p>
     </div>
-    <div class="brand" style="display:flex; align-items:center; gap:24px;">
+    <div class="brand" style="display:flex; align-items:center; gap:16px;">
       <a href="/hackathon/owner.html" style="color:var(--text-secondary); text-decoration:none; font-size:13px; font-weight:600; transition:color 0.2s; white-space:nowrap;" onmouseover="this.style.color='var(--accent-green)'" onmouseout="this.style.color='var(--text-secondary)'">🍕 View Live Orders</a>
-      <div style="display:flex; align-items:center; gap:16px;">
+      <div style="display:flex; align-items:center; gap:12px;">
         <div class="logo-btn" id="speakBtn" title="Click to hear live traction">✓</div>
         <div class="brand-text">
           <b>Aahwan Loyalty</b>
@@ -315,12 +397,35 @@
     <div style="color: var(--accent-green); font-size: 10px;">Pizza Ghar AI</div>
   </div>
 
-  <div class="footer">
-    <span>Data auto-synced with production MySQL database</span>
-    <span>Powered by Aahwan Loyalty & Meta AI</span>
-  </div>
-
 </div>
+
+<!-- Professional Footer -->
+<footer class="site-footer">
+  <div class="site-footer-inner">
+
+    <div class="site-footer-brand">
+      <img src="pizzaghar-real.png" alt="Pizza Ghar">
+      <div>
+        <div class="site-footer-brand-name">Pizza Ghar</div>
+        <div class="site-footer-brand-sub">by Aahwan IT Group</div>
+      </div>
+    </div>
+
+    <div class="site-footer-links">
+      <a href="index.html">Landing Page</a>
+      <a href="pizza-voice.html">Voice Agent</a>
+      <a href="owner.html">Owner Dashboard</a>
+      <a href="https://github.com/sitrsh12/meta-ai-hackathon-Aahwan_IT_Group" target="_blank">GitHub</a>
+      <a href="https://x.com/sitesh12" target="_blank">X (Twitter)</a>
+      <a href="https://www.linkedin.com/in/sitesh-adhikari/" target="_blank">LinkedIn</a>
+    </div>
+
+    <div class="site-footer-copy">
+      Built for the Meta Global AI Developer Hackathon.<br>Deployed live in Jhapa, Nepal 🇳🇵.
+    </div>
+
+  </div>
+</footer>
 
 <script>
 async function fetchTraction() {

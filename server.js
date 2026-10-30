@@ -269,7 +269,7 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
 
 app.get('/api/owner/orders', async (req, res) => {
   try {
-    const rows = await dbQuery("SELECT id, retailer_name, retailer_phone, total, order_note, status FROM catalog_orders WHERE store_id = 5 ORDER BY id DESC LIMIT 15", []);
+    const rows = await dbQuery("SELECT id, retailer_name, retailer_phone, total, order_note, status, created_at FROM catalog_orders WHERE store_id = 5 ORDER BY id DESC LIMIT 15", []);
     res.json({ success: true, orders: rows });
   } catch (err) {
     console.error('Owner Dashboard Error:', err.message);

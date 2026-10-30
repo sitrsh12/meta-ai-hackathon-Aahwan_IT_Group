@@ -49,7 +49,7 @@
     </header>
 
     <!-- AI Copilot Chat Box -->
-    <div class="bg-gradient-to-r from-indigo-900/50 to-purple-900/50 border border-indigo-500/30 rounded-xl p-5 mb-8">
+    <div class="bg-slate-800/80 border border-indigo-500/30 rounded-xl p-5 mb-8">
       <div class="flex items-center gap-2 mb-3">
         <span class="text-2xl">🤖</span>
         <h2 class="text-lg font-bold text-white">Owner AI Copilot</h2>
@@ -129,6 +129,37 @@
     </div>
 
   </div>
+
+  <!-- Footer -->
+  <footer class="border-t border-slate-800 bg-[#0f172a] relative z-10 mt-12 w-full">
+    <div class="max-w-6xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-6">
+      
+      <!-- Brand -->
+      <div class="flex items-center gap-3">
+        <img src="pizzaghar-real.png" alt="Pizza Ghar" class="h-8 w-auto bg-white rounded p-1 shadow-sm">
+        <div class="flex flex-col">
+          <span class="font-bold text-slate-200 tracking-tight leading-none">Pizza Ghar</span>
+          <span class="text-xs text-slate-500 mt-1">by Aahwan IT Group</span>
+        </div>
+      </div>
+
+      <!-- Links -->
+      <div class="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm text-slate-400 font-medium">
+        <a href="index.html" class="hover:text-emerald-400 transition whitespace-nowrap">Landing Page</a>
+        <a href="pizza-voice.html" class="hover:text-emerald-400 transition whitespace-nowrap">Voice Agent</a>
+        <a href="traction.html" class="hover:text-emerald-400 transition whitespace-nowrap">Traction</a>
+        <a href="https://github.com/sitrsh12/meta-ai-hackathon-Aahwan_IT_Group" target="_blank" class="hover:text-emerald-400 transition whitespace-nowrap">GitHub</a>
+        <a href="https://x.com/sitesh12" target="_blank" class="hover:text-emerald-400 transition whitespace-nowrap">X (Twitter)</a>
+        <a href="https://www.linkedin.com/in/sitesh-adhikari/" target="_blank" class="hover:text-emerald-400 transition whitespace-nowrap">LinkedIn</a>
+      </div>
+
+      <!-- Copyright -->
+      <div class="text-xs text-slate-500 text-center md:text-right leading-relaxed">
+        Built for the Meta Global AI Developer Hackathon.<br>Deployed live in Jhapa, Nepal 🇳🇵.
+      </div>
+
+    </div>
+  </footer>
 
 <script>
 // ====== AI COPILOT ======
@@ -322,6 +353,20 @@ async function deleteOrder(id) {
   }
 }
 
+function timeAgo(timestamp) {
+  if (!timestamp) return '';
+  const now = new Date();
+  const past = new Date(timestamp);
+  const diffMs = now - past;
+  const diffMins = Math.floor(diffMs / 60000);
+  if (diffMins < 1) return 'just now';
+  if (diffMins < 60) return diffMins + 'm ago';
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return diffHours + 'h ago';
+  const diffDays = Math.floor(diffHours / 24);
+  return diffDays + 'd ago';
+}
+
 async function fetchOrders() {
   try {
     const res = await fetch('/hackathon/api/owner/orders?v=' + Date.now(), { cache: 'no-store' });
@@ -358,12 +403,12 @@ async function fetchOrders() {
       const displayStatus = isPending ? 'PENDING' : 'PAID';
 
       html += `
-        <div class="bg-slate-800 rounded-xl p-5 border border-slate-700 shadow-xl relative overflow-hidden">
+        <div class="bg-slate-800 rounded-xl p-5 border relative overflow-hidden ${order.status === 'pending' ? 'border-yellow-500/30 shadow-[0_0_30px_rgba(234,179,8,0.15)]' : 'border-green-500/30 shadow-[0_0_30px_rgba(34,197,94,0.15)]'}">
           <div class="absolute top-0 left-0 w-full h-1 ${order.status === 'pending' ? 'bg-yellow-500' : 'bg-green-500'}"></div>
           
           <div class="flex justify-between items-start mb-4">
             <div>
-              <div class="text-xs text-slate-400 font-mono mb-1">ORDER #${order.id}</div>
+              <div class="text-xs text-slate-400 font-mono mb-1">ORDER #${order.id} <span class="text-slate-500 font-sans">· ${timeAgo(order.created_at)}</span></div>
               <div class="font-bold text-lg text-white">${order.retailer_name}</div>
               <div class="text-sm text-slate-400">${order.retailer_phone}</div>
             </div>
