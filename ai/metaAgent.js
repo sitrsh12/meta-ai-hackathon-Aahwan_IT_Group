@@ -115,6 +115,7 @@ async function executePizzaQuery(userQuery) {
     "- 'How many <ITEM> sold' = SUM of qty inside order_note JSON. NEVER use COUNT(*) for this. Use JSON_TABLE.\n" +
     "- Only output the raw SQL query (no markdown, no backticks, no explanation).\n" +
     "- Always start with SELECT.\n" +
+    "- ALWAYS include 'LIMIT 20' unless the query is an aggregate (COUNT, SUM, AVG).\n" +
     "Examples:\n" +
     "Q: How many orders total? -> SELECT COUNT(*) AS total_orders FROM catalog_orders;\n" +
     "Q: What is total revenue? -> SELECT SUM(total) AS revenue FROM catalog_orders;\n" +
@@ -133,10 +134,10 @@ async function executePizzaQuery(userQuery) {
       return "I can only answer read-only questions about orders and inventory.";
     }
 
-    // GUARDRAIL: Force store_id = 5 on any products query
+    // GUARDRAIL 1: Force store_id = 5 on any products query
     let finalSQL = cleanSQL;
     if (/\bfrom\s+products\b/i.test(finalSQL) && !/\bstore_id\s*=\s*5\b/i.test(finalSQL)) {
-      console.log('⚠️  [GUARDRAIL] Products query missing store_id = 5, auto-fixing...');
+      console.log('⚠️  [GUARDRAIL 1] Products query missing store_id = 5, auto-fixing...');
       if (/\bwhere\b/i.test(finalSQL)) {
         finalSQL = finalSQL.replace(/\bwhere\b/i, 'WHERE store_id = 5 AND');
       } else if (/\border\s+by\b/i.test(finalSQL)) {
@@ -149,7 +150,16 @@ async function executePizzaQuery(userQuery) {
       console.log('🔧 [FIXED SQL]:', finalSQL);
     }
 
-    const dbResult = await query(finalSQL, []);
+    // GUARDRAIL 2: Enforce hard LIMIT 50 if not an aggregate and missing LIMIT
+    const isAggregate = /\b(COUNT|SUM|AVG|MIN|MAX)\s*\(/i.test(finalSQL);
+    if (!isAggregate && !/\blimit\b/i.test(finalSQL)) {
+      console.log('⚠️  [GUARDRAIL 2] Adding hard LIMIT 50 to prevent large result sets.');
+      finalSQL = finalSQL.replace(/;?\s*$/, ' LIMIT 50;');
+    }
+
+    // GUARDRAIL 3: Execute with 5-second timeout
+    console.log('🔒 [EXECUTING]', finalSQL);
+    const [dbResult] = await pool.execute({ sql: finalSQL, timeout: 5000 });
     
     if (!dbResult || dbResult.length === 0) {
       return "The query returned no data.";
