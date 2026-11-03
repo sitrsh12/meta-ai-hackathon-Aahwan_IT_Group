@@ -2,7 +2,7 @@
 
 ![Live](https://img.shields.io/badge/LIVE-Birtamode_Jhapa-green)
 ![Meta](https://img.shields.io/badge/Model-Muse_Spark_1.3-blue)
-![Traction](https://img.shields.io/badge/Traction-116_Customers-orange)
+![Traction](https://img.shields.io/badge/Traction-124_Customers-orange)
 ![STT](https://img.shields.io/badge/STT-Groq_Whisper_v3-purple)
 
 **Startup Track | Build for Your World**
@@ -33,7 +33,7 @@
 - 🚀 **Landing Page (Start Here):** [/](https://whatsapp.zappertrip.com/hackathon/)
 - 🎤 **Customer Voice Agent:** [/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
 - 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
-- 📈 **Traction Dashboard (116 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
+- 📈 **Traction Dashboard (124 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
 
 ### 🏪 Real Client Consent - VERIFIED
 **Client:** PizzaGhar, Birtamode, Jhapa, Nepal  
@@ -47,7 +47,7 @@ Small shops in Nepal live on WhatsApp. Manual order-taking is chaotic. Generic b
 PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perfect order.
 
 ### 💼 Business Impact & Scale
-- **Current Traction:** We are **Aahwan IT Group Pvt Ltd** (founded 2017), a software company based in Nepal. Our flagship product is **[Zappertrip](https://zappertrip.com)**, a WhatsApp automation platform launched in Feb 2026, which powers **5 shops** in Jhapa, serving **116 active customers** and **21,000+ loyalty points** (verified production MySQL data).
+- **Current Traction:** We are **Aahwan IT Group Pvt Ltd** (founded 2017), a software company based in Nepal. Our flagship product is **[Zappertrip](https://zappertrip.com)**, a WhatsApp automation platform launched in Feb 2026, which powers **5 shops** in Jhapa, serving **124 active customers** and **21,000+ loyalty points** (verified production MySQL data).
 - **Hackathon Innovation:** The Voice Ordering Agent is built *on top* of Aahwan Loyalty, currently piloted with **PizzaGhar (Birtamode)** as the flagship client. The other 4 pilot shops will receive the voice agent next.
 - **Business Model (SaaS):** We charge a subscription of **Rs 1,500/month** per shop (or 1% transaction fee). 
 - **Target Market:** There are **50,000+** registered restaurants and cafes in Nepal alone. If we capture just 1% of this market, it represents Rs 75 Lakhs in MRR.
@@ -86,6 +86,19 @@ Primary: Groq whisper-large-v3 with language: ne -> Perfect Nepali Devanagari, <
 Fallback: Meta Muse Voice (integrated via Meta Model API) -> Maximizes Meta ecosystem use.
 
 This is honest engineering for a real-world client, not just a demo.
+
+### 🛡️ Reliability & Validation (Tested in Production)
+
+We didn't just write code; we hardened it for real customers handling real money. 
+
+- **Live Validation:** The system is currently serving **124 active customers** across 5 shops. It is processing live orders, generating food images, and updating live MySQL data in production. This is the ultimate integration test.
+- **Hardened SQL Guardrails:** The Owner Copilot is locked down with a 3-layer defense:
+  1. **Prompt-level:** Strict instruction to always start with `SELECT` and include `LIMIT 20`.
+  2. **Backend-level:** Programmatic `SELECT` prefix check, a hard `LIMIT 50` fallback for non-aggregate queries, and a strict 5-second query timeout.
+  3. **Database-level (Roadmap):** Isolation of the Copilot to a `GRANT SELECT`-only MySQL user for production deployment.
+- **Graceful Failure:** The voice agent doesn't just crash if a model fails. We have a dual-STT pipeline (Groq + Meta), a manual text fallback box if the microphone fails, and strict frontend abort controllers to prevent infinite hangs.
+
+This is what production AI looks like.
 
 ### Demo Flow (60s)
 1. Enter phone, tap mic: "One Veggie Feast Pizza" (Without a drink)
