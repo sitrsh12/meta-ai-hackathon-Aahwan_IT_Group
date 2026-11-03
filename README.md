@@ -31,10 +31,10 @@
 
 ### 🌐 Live Demos (Judge Click Here)
 
-- 🚀 **Landing Page (Start Here):** [/](https://whatsapp.zappertrip.com/hackathon/)
-- 🎤 **Customer Voice Agent:** [/pizza-voice.html](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)
-- 📊 **Owner Dashboard (Live Orders):** [/owner.html](https://whatsapp.zappertrip.com/hackathon/owner.html)
-- 📈 **Traction Dashboard (124 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
+- 🚀 **[Landing Page (Start Here)](https://whatsapp.zappertrip.com/hackathon/)**
+- 🎤 **[Customer Voice Agent](https://whatsapp.zappertrip.com/hackathon/pizza-voice.html)**
+- 📊 **[Owner Dashboard](https://whatsapp.zappertrip.com/hackathon/owner.html)**
+- 📈 **[Traction Dashboard](https://whatsapp.zappertrip.com/hackathon/traction.html)** *(124 customers, 5 shops)*
 
 ### 🏪 Real Client Consent - VERIFIED
 **Client:** PizzaGhar, Birtamod, Jhapa, Nepal  
