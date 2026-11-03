@@ -101,6 +101,8 @@ We didn't just write code; we hardened it for real customers handling real money
   3. **Database-level (Roadmap):** Isolation of the Copilot to a `GRANT SELECT`-only MySQL user for production deployment.
 - **Graceful Failure:** The voice agent doesn't just crash if a model fails. We have a dual-STT pipeline (Groq + Meta), a manual text fallback box if the microphone fails, and strict frontend abort controllers to prevent infinite hangs.
 
+- **Direct Meta API:** While hackathon partner inference (Baseten, Modal) is available, we chose the direct Meta Model API for the production pilot. This gave us the lowest latency for synchronous voice interactions and direct access to Muse Spark 1.3's strict JSON output, which was critical for our state machine.
+
 This is what production AI looks like.
 
 ### Demo Flow (60s)
