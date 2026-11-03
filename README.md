@@ -3,7 +3,9 @@
 ![Live](https://img.shields.io/badge/LIVE-Birtamod_Jhapa-green)
 ![Meta](https://img.shields.io/badge/Model-Muse_Spark_1.3-blue)
 ![Traction](https://img.shields.io/badge/Traction-124_Customers-orange)
-![STT](https://img.shields.io/badge/STT-Groq_Whisper_v3-purple)
+![Ears](https://img.shields.io/badge/Ears-Groq_Whisper_v3-purple)
+
+🎙️ **Live Voice Agent | 124 Real Customers | Meta AI Powered**
 
 **Startup Track | Build for Your World**
 > Production voice agent for a real restaurant in Nepal. Live in Birtamod, Jhapa.
