@@ -1,18 +1,19 @@
 # 🍕 PizzaGhar - Voice Ordering Agent | Meta Global AI Hackathon
 
-![Live](https://img.shields.io/badge/LIVE-Birtamode_Jhapa-green)
+![Live](https://img.shields.io/badge/LIVE-Birtamod_Jhapa-green)
 ![Meta](https://img.shields.io/badge/Model-Muse_Spark_1.3-blue)
 ![Traction](https://img.shields.io/badge/Traction-124_Customers-orange)
 ![STT](https://img.shields.io/badge/STT-Groq_Whisper_v3-purple)
 
 **Startup Track | Build for Your World**
-> Production voice agent for a real restaurant in Nepal. Live in Birtamode, Jhapa.
+> Production voice agent for a real restaurant in Nepal. Live in Birtamod, Jhapa.
 
 **Built by:** [Sitesh Adhikari](https://www.linkedin.com/in/sitesh-adhikari/) — Founder, Aahwan IT Group Pvt Ltd
 
 **Live App:** https://whatsapp.zappertrip.com/hackathon/
 
 **Demo Video:** [🎥 Watch the 3-Minute Pitch](https://www.youtube.com/watch?v=JlpBn9pfQHI)
+*(Note: Video recorded on Oct 31st with 116 customers. We have grown organically to 124 active customers as of submission on Nov 3rd.)*
 
 <table>
 <tr>
@@ -36,7 +37,7 @@
 - 📈 **Traction Dashboard (124 customers, 5 shops):** [/traction.html](https://whatsapp.zappertrip.com/hackathon/traction.html)
 
 ### 🏪 Real Client Consent - VERIFIED
-**Client:** PizzaGhar, Birtamode, Jhapa, Nepal  
+**Client:** PizzaGhar, Birtamod, Jhapa, Nepal  
 **Consent:** ✅ Obtained on 27 Oct 2026 via WhatsApp  
 **Permission:** Shop name, photo, demo video usage for Meta Hackathon  
 **Privacy:** Customer PII masked (98XXXXXXXX).
@@ -48,7 +49,7 @@ PizzaGhar understands: "Euta veggie feast pizza ra mango lassi dinus na" -> Perf
 
 ### 💼 Business Impact & Scale
 - **Current Traction:** We are **Aahwan IT Group Pvt Ltd** (founded 2017), a software company based in Nepal. Our flagship product is **[Zappertrip](https://zappertrip.com)**, a WhatsApp automation platform launched in Feb 2026, which powers **5 shops** in Jhapa, serving **124 active customers** and **21,000+ loyalty points** (verified production MySQL data).
-- **Hackathon Innovation:** The Voice Ordering Agent is built *on top* of Aahwan Loyalty, currently piloted with **PizzaGhar (Birtamode)** as the flagship client. The other 4 pilot shops will receive the voice agent next.
+- **Hackathon Innovation:** The Voice Ordering Agent is built *on top* of Aahwan Loyalty, currently piloted with **PizzaGhar (Birtamod)** as the flagship client. The other 4 pilot shops will receive the voice agent next.
 - **Business Model (SaaS):** We charge a subscription of **Rs 1,500/month** per shop (or 1% transaction fee). 
 - **Target Market:** There are **50,000+** registered restaurants and cafes in Nepal alone. If we capture just 1% of this market, it represents Rs 75 Lakhs in MRR.
 - **Why Meta AI?** Without Muse Spark's strict JSON extraction and Groq's fast Nepali transcription, this voice pipeline would be too slow and expensive to run on a profit margin at this scale.
